@@ -1,0 +1,27 @@
+# Hilangkan index.php dari URL
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # RewriteBase /
+    # Jika file atau folder tidak ada, teruskan ke index.php
+    RewriteCond %{REQUEST_URI} !^/(manifest\.json|sw\.js|robots\.txt|favicon\.ico)$ [NC]
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php/$1 [L]
+</IfModule>
+
+# Lindungi file penting
+<FilesMatch "\.(env.php|env|lock|md|gitignore|htaccess|htpasswd|ini|yml|log)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+#<DirectoryMatch "^\.well-known">
+#    <FilesMatch "\.php$">
+#        Order allow,deny
+#        Deny from all
+#    </FilesMatch>
+#</DirectoryMatch>
+
+<IfModule mod_env.c>
+    SetEnv CI_ENV 'development'
+</IfModule>

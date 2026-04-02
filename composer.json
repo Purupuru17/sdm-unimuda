@@ -1,0 +1,21 @@
+{
+    "name": "project/puru",
+    "description": "Puru's Project",
+    "type": "project",
+    "license": "GPL",
+    "homepage": "/",
+    "authors": [
+        {
+            "name": "puru17",
+            "email": "puru17@gmail.com"
+        }
+    ],
+    "require": {
+        "phpoffice/phpspreadsheet": "^1.6",
+        "dompdf/dompdf": "^0.8.3",
+        "aws/aws-sdk-php": "3.183",
+        "guzzlehttp/guzzle": "^7.0",
+        "ifsnop/mysqldump-php": "^2.9",
+        "firebase/php-jwt": "^5.5"
+    }
+}

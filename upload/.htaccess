@@ -1,0 +1,8 @@
+Order deny,allow
+Deny from all
+<Files ~ ".(jpe?g|png|gif|pdf|css|js|eot|svg|ttf|woff|woff2|txt|html|doc|docx|xls|xlsx|ppt|pptx|JPG|map|sql)$">
+    Allow from all
+</Files>
+<FilesMatch "\.(php|php5|php7|phar)$">
+    Deny from all
+</FilesMatch>
