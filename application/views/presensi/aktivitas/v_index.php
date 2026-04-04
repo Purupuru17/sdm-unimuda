@@ -18,60 +18,13 @@ $this->load->view('sistem/v_breadcrumb');
         <div class="col-xs-12">
             <form id="search-form" action="<?= site_url($module.'/export') ?>" name="form" class="form-horizontal" method="POST">
                 <div class="form-group">
-                    <label class="control-label col-xs-12 col-sm-2 no-padding-right">Periode :</label>
-                    <div class="col-xs-12 col-sm-3">
-                        <div class="clearfix">
-                            <select class="select2 width-100" name="periode" id="periode" data-placeholder="------> Pilih Periode <------">
-                                <option value=""> </option>
-                                <?php
-                                foreach ($semester['data'] as $val) {
-                                    $selected = ($this->session->userdata('idsmt') == $val['id_semester']) ? 'selected' : '';
-                                    echo '<option value="' . encode($val['id_semester']) . '" ' . $selected . '>' . $val['nama_semester'] . '</option>';
-                                }
-                                ?>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="control-label col-xs-12 col-sm-2 no-padding-right">Program Studi :</label>
-                    <div class="col-xs-12 col-sm-3">
-                        <div class="clearfix">
-                            <select class="select2 width-100" name="prodi" id="prodi" data-placeholder="------> Pilih Program Studi <------">
-                                <option value=""> </option>
-                                <?php
-                                foreach ($prodi['data'] as $val) {
-                                    $selected = ($prodi_id == $val['id_prodi']) ? 'selected' : '';
-                                    echo '<option value="'.encode($val['id_prodi']).'" '.$selected.'>'.$val['nama_prodi'].'</option>';
-                                }
-                                ?>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="control-label col-xs-12 col-sm-2 no-padding-right">Angkatan :</label>
-                    <div class="col-xs-12 col-sm-2">
-                        <div class="clearfix">
-                            <select class="select2 width-100" name="tahun" id="tahun" data-placeholder="---> Pilih Tahun <---">
-                                <option value=""> </option>
-                                <?php
-                                foreach (load_array('tahun') as $val) {
-                                    echo '<option value="'.$val.'">'.$val.'</option>';
-                                }
-                                ?>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group">
                     <label class="control-label col-xs-12 col-sm-2 no-padding-right">Status :</label>
                     <div class="col-xs-12 col-sm-2">
                         <div class="clearfix">
                             <select class="select2 width-100" name="status" id="status" data-placeholder="---> Pilih Status <---">
                                 <option value=""> </option>
                                 <?php
-                                foreach (load_array('st_cuti') as $val) {
+                                foreach (['TEPAT WAKTU', 'TERLAMBAT'] as $val) {
                                     echo '<option value="'.$val.'" >'.$val.'</option>';
                                 }
                                 ?>
@@ -85,7 +38,7 @@ $this->load->view('sistem/v_breadcrumb');
                             <i class="ace-icon fa fa-search-plus"></i>
                             Pencarian
                         </button>
-                        <button class="btn btn-success btn-white btn-bold" name="export" id="btn-export" type="submit">
+                        <button class="btn btn-success btn-white btn-bold hide" name="export" id="btn-export" type="submit">
                             <i class="ace-icon fa fa-file-excel-o"></i>
                             Export
                         </button>
@@ -114,11 +67,11 @@ $this->load->view('sistem/v_breadcrumb');
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>Mahasiswa</th>
-                                    <th>Program Studi</th>
-                                    <th>IPK & SKS</th>
+                                    <th>Pegawai</th>
+                                    <th>Tanggal</th>
+                                    <th>Masuk</th>
                                     <th>Status</th>
-                                    <th width="30%">Keterangan</th>
+                                    <th>Pulang</th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
@@ -142,17 +95,24 @@ $this->load->view('sistem/v_breadcrumb');
 ?>
 <script type="text/javascript">
     const module = "<?= site_url($module) ?>";
+    let indexTable;
     $(document).ready(function () {
         $(".select2").select2({allowClear: true});
         $(".select2-chosen").addClass("center");
-        //load_index();
+        loadIndex();
     });
-    $(document.body).on("click", "#note-btn", function(e) {
+    $(document.body).on("click", "#imgMasuk-btn", function(e) {
         e.preventDefault();
-        var name = $(this).attr("itemname");
-        var prop = $(this).attr("itemprop");
-        var title = "<h4 class='blue center'><i class='ace-icon fa fa-pencil-square-o'></i> " + name + " </h4>";
-        var msg = "<p class='center grey bigger-120'>" + prop + " </p>";
+        const id = $(this).attr("itemid");
+        const title = "<h4 class='blue center'><i class='ace-icon fa fa-image'></i> Foto Masuk </h4>";
+        const msg = `<p class="center"><img src="${id}" class="img-thumbnail" width="100%"/> </p>`;
+        bootbox.dialog({ title: title, message: msg, closeButton: true });
+    });
+    $(document.body).on("click", "#imgPulang-btn", function(e) {
+        e.preventDefault();
+        const id = $(this).attr("itemid");
+        const title = "<h4 class='orange center'><i class='ace-icon fa fa-image'></i> Foto Pulang </h4>";
+        const msg = `<p class="center"><img src="${id}" class="img-thumbnail" width="100%"/> </p>`;
         bootbox.dialog({ title: title, message: msg, closeButton: true });
     });
     $(document.body).on("click", "#delete-btn", function(e) {
@@ -176,16 +136,15 @@ $this->load->view('sistem/v_breadcrumb');
             }
         });
     });
-    function load_index() {
+    function loadIndex() {
         const indexTable = new DataTableManager("#index-table", {
             bServerSide: true,
             ajax: {
                 url: module + "/ajax/type/table/source/index",
                 type: "POST",
                 data: function (val) {
-                    val.periode = $("#periode").val();
-                    val.prodi = $("#prodi").val();
-                    val.tahun = $("#tahun").val();
+                    val.tanggal = $("#tanggal").val();
+                    val.pegawai = $("#pegawai").val();
                     val.status = $("#status").val();
                 }
             },
@@ -196,7 +155,6 @@ $this->load->view('sistem/v_breadcrumb');
                 {sClass: "center nowrap", aTargets: [6]}
             ]
         }).init();
-        // reload filter
         $("#btn-search").click(function () {
             indexTable.reload();
         });

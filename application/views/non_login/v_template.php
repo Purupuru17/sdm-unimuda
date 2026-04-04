@@ -34,20 +34,26 @@
             'theme/aceadmin/assets/css/font-awesome.css',
             'theme/aceadmin/assets/css/ace-fonts.css',
             'theme/aceadmin/assets/css/ace-rtl.css',
-            'theme/aceadmin/puru.css',
             'theme/aceadmin/assets/css/jquery.gritter.css',
+            'theme/aceadmin/assets/fonts/poppins/font.css?family=Poppins:300,400,500,600,700',
+                
+            'theme/aceadmin/puru.css',
         ));
         load_js(array(
             'theme/aceadmin/assets/js/ace-extra.js',
             'theme/aceadmin/assets/js/jquery.js',
+            
             'theme/aceadmin/assets/js/bootstrap.js',
-            'theme/aceadmin/assets/js/ace/elements.fileinput.js',
-            'theme/aceadmin/assets/js/ace/ace.js',
             'theme/aceadmin/assets/js/jquery.gritter.js',
             'theme/aceadmin/assets/js/lazy/lazysizes.min.js',
+            'theme/aceadmin/assets/js/bootbox.min.js',
+            'theme/aceadmin/sweetalert.min.js',
+            'theme/aceadmin/puru.js',
+            
+            'theme/aceadmin/assets/js/ace/elements.fileinput.js',
+            'theme/aceadmin/assets/js/ace/ace.js',
         ));
         ?>
-        <!-- ace styles -->
         <link rel="stylesheet" href="<?= base_url('theme/aceadmin/assets/css/ace.css') ?>" class="ace-main-stylesheet" id="main-ace-style" />
 
     </head>
@@ -59,9 +65,6 @@
             </div><!-- /.main-content -->
         </div><!-- /.main-container -->
         <script type="text/javascript">
-            if ('ontouchstart' in document.documentElement)
-                document.write("<script src='<?= base_url('theme/aceadmin/assets/js/jquery.mobile.custom.js') ?>'>" + "<" + "/script>");
-            
             $(document).ready(function() {
                 var login = "<?= $app_theme['login'] ?>";
                 if (login === "1") {

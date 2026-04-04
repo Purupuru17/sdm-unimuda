@@ -9,10 +9,7 @@ class KZ_Controller extends CI_Controller {
     public $sessionlevel = null;
     public $sessionfoto = null;
     
-    public $smtid = null;
-    public $mid = null;
     public $pid = null;
-    public $did = null;
             
     function __construct() {
         parent::__construct();
@@ -162,5 +159,15 @@ class KZ_Controller extends CI_Controller {
         $this->output->set_header("Cache-Control: public, no-store, max-age=0, no-cache, must-revalidate, post-check=0, pre-check=0");
         // HTTP/1.0
         $this->output->set_header("Pragma: no-cache");
+    }
+    function _pegawaiId() {
+        if(empty($this->session->userdata('pid'))){
+            $rs = $this->db->get_where('m_pegawai', ['user_id' => $this->sessionid])
+                ->row_array();
+            if(!is_null($rs)){
+                $this->session->set_userdata(array('pid' => $rs['id_pegawai']));
+            }
+        }
+        $this->pid = $this->session->userdata('pid');
     }
 }

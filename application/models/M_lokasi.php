@@ -6,4 +6,15 @@ class M_lokasi extends KZ_Model {
     protected $table = 'm_lokasi';
     protected $uuid = true;
     
+    function getEmpty()
+    {
+        return [
+            $this->id => null,
+            'nama_lokasi' => null,
+            'latitude' => null,
+            'longitude' => null,
+            'radius' => null,
+            'status_lokasi' => null
+        ];
+    }
 }

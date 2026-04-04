@@ -1,7 +1,4 @@
 <?php $this->load->view('sistem/v_breadcrumb'); ?>
-<style>
-    video { border-radius:10px; width:100%; max-width:350px; }
-</style>
 <div class="page-content">
     <div class="page-header">
         <h1>
@@ -17,29 +14,87 @@
             <?= $this->session->flashdata('notif'); ?>
         </div>
         <div class="col-xs-12">
-            <h3 class="lighter center block blue"><?= $title[0] ?></h3>
+            <h3 class="lighter center block blue">
+                Presensi Aktivitas Kerja <br>[ <span class="is-clock"><?= format_date(date('Y-m-d H:i:s'),0) ?></span> ]
+            </h3>
+            <div class="space-10"></div>
             <form id="validation-form" action="#" name="form" class="form-horizontal" method="POST" enctype="multipart/form-data">
-                
-                
-                <video id="video" autoplay playsinline></video>
-                <canvas id="canvas" style="display:none;"></canvas>
-                
-                <img id="preview_foto" style="margin-top:10px; max-width:300px; display:none; border-radius:10px;">
-
-                <textarea id="alamat" readonly placeholder="Mengambil alamat..."></textarea>
-
-                <input type="text" id="latitude">
-                <input type="text" id="longitude">
-                <input type="text" id="foto_base64">
-
-                <br>
-                <button onclick="startFoto()" type="button">Ambil Foto</button>
-                <button onclick="restartFoto()" type="button">Ulang Foto</button>
-                <button id="btnMaps" onclick="bukaMaps()" type="button">Google Maps</button>
-                <button onclick="kirim()" type="button">Kirim Presensi</button>
-                <button id="btnRetryGPS" onclick="restartGPS()" style="display:none;" type="button">Ambil Ulang GPS</button>
-                
-                
+                <div class="form-group">
+                    <label class="control-label col-xs-12 col-sm-4 no-padding-right">
+                        <button onclick="restartGPS()" id="btn-gps" disabled="disabled"
+                            class="btn btn-bold btn-primary btn-white btn-sm" type="button">
+                            <i class="ace-icon fa fa-map-marker bigger-120"></i>
+                            GPS Lokasi
+                        </button>
+                    </label>
+                    <div class="col-xs-12 col-sm-6">
+                        <div class="space-2"></div>
+                        <span class="input-icon">
+                            <input value="" type="text" name="latitude" id="latitude" placeholder="Latitude" class="input-medium bolder"/>
+                        </span>
+                        <span class="input-icon input-icon-right">
+                            <input value="" type="text" name="longitude" id="longitude" placeholder="Longitude" class="input-medium bolder"/>
+                        </span>
+                    </div>
+                    <span class="help-inline col-sm-8 col-sm-offset-4 col-xs-12">
+                        <span id="alamat" class="middle red">Mengambil alamat ...</span>
+                    </span>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-xs-12 col-sm-4 no-padding-right"></label>
+                    <div class="col-xs-12 col-sm-6">
+                        <div class="clearfix">
+                            <input value="" type="text" name="lokasi" id="lokasi" class="col-xs-12 col-sm-6 bolder bigger-120" placeholder="Lokasi Presensi berdasarkan GPS" />
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-xs-12 col-sm-4 no-padding-right">
+                        <button onclick="restartFoto()" id="btn-kamera"
+                            class="btn btn-bold btn-warning btn-white btn-sm" type="button">
+                            <i class="ace-icon fa fa-camera bigger-120"></i>
+                            Buka Kamera
+                        </button>
+                    </label>
+                    <div class="col-xs-12 col-sm-4">
+                        <div class="clearfix">
+                            <video id="video" autoplay playsinline class="img-thumbnail" style="display: none; max-width: 350px"></video>
+                            <canvas id="canvas" style="display:none;"></canvas>
+                            
+                            <img id="preview" width="350" class="img-thumbnail" style="display: none">
+                            <input type="hidden" name="foto" id="foto">
+                        </div>
+                        <div class="space-2"></div>
+                        <button onclick="takeFoto()" style="display: none" id="btn-foto"
+                            class="btn btn-bold btn-success btn-white btn-sm" type="button">
+                            <i class="ace-icon fa fa-camera bigger-120"></i>
+                            Ambil Foto
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-xs-12 col-sm-4 no-padding-right bolder">Status <span class="red">*</span> :</label>
+                    <div class="col-xs-12 col-sm-7">
+                        <div class="clearfix">
+                            <label class="control-label">
+                                <input name="status" value="1" type="radio" class="ace input-lg" />
+                                <span class="lbl bolder blue bigger-120"> MASUK </span>
+                            </label>&nbsp;&nbsp;&nbsp;
+                            <label class="control-label">
+                                <input name="status" value="2" type="radio" class="ace input-lg" />
+                                <span class="lbl bolder orange bigger-120"> PULANG </span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="clearfix form-actions">
+                    <div class="col-sm-offset-4 col-sm-5">
+                        <button class="btn btn-success" name="simpan" type="submit">
+                            <i class="ace-icon fa fa-paper-plane"></i>
+                            Simpan Presensi
+                        </button>
+                    </div>
+                </div>
             </form>
         </div>
         <!-- /.col -->
@@ -47,7 +102,6 @@
 </div><!-- /.page-content -->
 <?php
 load_js(array(
-    
     'theme/aceadmin/assets/js/select2.js',
     'theme/aceadmin/assets/js/jquery.validate.js'
 ));
@@ -64,45 +118,30 @@ load_js(array(
     
     $(document).ready(function () {
         $(".select2").select2({allowClear: true});
-        //load_select();
-        //validate_form();
+        $(".select2-chosen").addClass("center");
+        validateForm();
         startGPS();
     });
-    $(document).on("focusin", "#sks,#ipk", function() {
+    $(document).on("focusin", "#latitude,#longitude,#lokasi", function() {
         $(this).prop('readonly', true);
     });
-    $(document).on("focusout", "#sks,#ipk", function() {
+    $(document).on("focusout", "#latitude,#longitude,#lokasi", function() {
         $(this).prop('readonly', false); 
-    });
-    $("#mhs").change(function () {
-        let data = $("#mhs").select2('data');
-        $("#txt-mhs").html(data.text);
-        if(data.status){
-            $("#txt-status").addClass("hide");
-            $(".form-actions").removeClass("hide"); 
-        }else{
-            $("#txt-status").removeClass("hide");
-            $(".form-actions").addClass("hide"); 
-        }
-        $("#sks,#ipk").val('');
-        $(".is-akm").html('');
     });
 </script>
 <script type="text/javascript">
     // ================== GPS ==================
-
     function startGPS(){
-
         lokasiFix = false;
-
-        document.getElementById("btnRetryGPS").style.display = "none";
-        document.getElementById("alamat").value = "Mengaktifkan GPS...";
-
+        
+        $("#latitude, #longitude, #lokasi").val("");
+        $("#btn-gps").attr("disabled", "disabled");
+        $("#alamat").html("Mengaktifkan GPS ...");
+        
         if (!navigator.geolocation){
-            alert("Browser tidak mendukung GPS");
+            jsfNotif("Peringatan", "Browser tidak mendukung. Aktifkan pengaturan GPS", 3, 'swal');
             return;
         }
-
         watchID = navigator.geolocation.watchPosition(
             successGPS,
             errorGPS,
@@ -112,250 +151,221 @@ load_js(array(
                 maximumAge: 0
             }
         );
-
         // timeout 20 detik
         gpsTimeout = setTimeout(function(){
-
             if(!lokasiFix){
-
                 navigator.geolocation.clearWatch(watchID);
-
-                document.getElementById("alamat").value =
-                    "GPS belum akurat. Silakan coba ulang.";
-
-                document.getElementById("btnRetryGPS").style.display = "inline-block";
-
+                
+                $("#btn-gps").removeAttr("disabled");
+                $("#alamat").html("GPS belum akurat. Silakan coba ulang.");
+                jsfNotif("Peringatan", "GPS belum akurat. Silakan coba ulang.", 2, 'swal');
             }
-
         },10000);
-
     }
-
     function successGPS(pos){
-
+        //SAMPLE
+//        let lat = -1.1160209;
+//        let lng = 131.2859550;
+//        let accuracy = 10;
+        
         let lat = pos.coords.latitude;
         let lng = pos.coords.longitude;
         let accuracy = pos.coords.accuracy;
-
-        document.getElementById("alamat").value =
-            "Mencari lokasi akurat... ("+Math.round(accuracy)+" meter)";
-
+        
+        $("#alamat").html(`<i class="fa fa-spinner fa-spin fa-fw fa-2x"></i> 
+            Mencari lokasi akurat, tunggu sebentar . . . (`+Math.round(accuracy)+` meter)`);
         if(accuracy > 30){
             return;
         }
-
         if(lokasiFix) return;
         lokasiFix = true;
 
         clearTimeout(gpsTimeout);
         navigator.geolocation.clearWatch(watchID);
 
-        document.getElementById("latitude").value = lat;
-        document.getElementById("longitude").value = lng;
-
         fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
-                    .then(res => res.json())
-                    .then(data => {
-
-                        if (data.display_name) {
-                            document.getElementById("alamat").value = data.display_name;
-                        } else {
-                            document.getElementById("alamat").value = lat + ", " + lng;
-                        }
-
-                    })
-                    .catch(() => {
-                        document.getElementById("alamat").value = lat + ", " + lng;
-                    });
-
+            .then(res => res.json())
+            .then(data => {
+                if (data.display_name) {
+                    $("#alamat").html(data.display_name);
+                } else {
+                    $("#alamat").html(lat + ", " + lng);
+                }
+            })
+            .catch(() => {
+                $("#alamat").html(lat + ", " + lng);
+            });
+       
+        $("#latitude").val(lat);
+        $("#longitude").val(lng);
+        // AJAX LOCATION
+        setTimeout(function () {
+            checkLocation(lat, lng);
+        }, 1000);
     }
-
     function errorGPS(err) {
-
-        document.getElementById("alamat").value =
-                "GPS error: " + err.message;
-
-        document.getElementById("btnRetryGPS").style.display = "inline-block";
-
+        $("#btn-gps").removeAttr("disabled");
+        
+        $("#alamat").html("GPS Error : " + err.message);
+        jsfNotif("Peringatan", "GPS Error : " + err.message, 3, 'swal');
     }
-
     function restartGPS() {
-
         if (watchID) {
             navigator.geolocation.clearWatch(watchID);
         }
-
         clearTimeout(gpsTimeout);
-
         startGPS();
-
     }
-
-    // start saat halaman load
-    
-
     // ================== Ambil Foto ==================
-    function startFoto() {
-
+    async function takeFoto() {
+        
         const username = "<?= $this->session->userdata('name') ?>";
+        const lokasi = $("#lokasi").val();
+        
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
-
         const maxWidth = 600;
         const scale = maxWidth / video.videoWidth;
         
-        const latitude = $("#latitude").val();
-        const longitude = $("#longitude").val();
-        
-        if(!video){
+        if(!video.videoWidth){
             jsfNotif('Peringatan', 'Foto tidak ditemukan', 2, 'swal');
             return;
         }
-        if(!latitude || !longitude){
-//            jsfNotif('Peringatan', 'Lokasi tidak ditemukan', 2, 'swal');
-//            return;
+        if(!lokasi){
+            jsfNotif('Peringatan', 'Lokasi tidak ditemukan', 2, 'swal');
+            return;
         }
-        
         canvas.width = maxWidth;
         canvas.height = video.videoHeight * scale;
-
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
         // ===== Watermark =====
         ctx.fillStyle = "white";
         ctx.font = "16px Arial";
         ctx.fillText(username, 10, canvas.height - 60);
         ctx.fillText(new Date().toLocaleString(), 10, canvas.height - 40);
-        ctx.fillText("GPS : " + latitude + ", " + longitude, 10, canvas.height - 20);
-
+        ctx.fillText("Lokasi : " + lokasi, 10, canvas.height - 20);
         // ===== Compress =====
         let quality = 0.7;
         let dataURL = canvas.toDataURL('image/jpeg', quality);
-
-        $("#foto_base64").val(dataURL);
-
         // ===== preview =====
-        let preview = document.getElementById("preview_foto");
+        let preview = document.getElementById("preview");
         preview.src = dataURL;
         preview.style.display = "block";
-        console.log("Ukuran:", Math.round(dataURL.length / 1024), "KB");
-
+        
         // Stop kamera
         streamGlobal.getTracks().forEach(track => track.stop());
-//        video.srcObject = null;
+        video.srcObject = null;
+        // Set Foto
+        $("#foto").val(dataURL);
+        $("#video, #btn-foto").hide();
+        $("#btn-kamera").show();
+        jsfNotif('Informasi', 'Foto berhasil', 1);
     }
-
     function restartFoto() {
-        $("#preview_foto").hide();
-        $("#foto_base64").val("");
+        $("#preview").hide();
+        $("#video").show();
+        $("#foto").val("");
         //Buka Kamera
         navigator.mediaDevices.getUserMedia({ 
             video: { facingMode: "user" }
         })
         .then(stream => {
-            streamGlobal = stream; video.srcObject = stream;
+            streamGlobal = stream; 
+            video.srcObject = stream;
+            $("#btn-foto").show();
+            $("#btn-kamera").hide();
         })
         .catch(err => {
             jsfNotif('Peringatan', 'Kamera tidak dizinkan. Buka pengaturan akses pada Browser', 3, 'swal');
         });
-    }
+    }   
 </script>
 <script type="text/javascript">
-//    function load_akm() {
-//        let id = $("#mhs").val();
-//        let selected = $("#mhs").select2('data');
-//        
-//        if(id === '' || id === null){
-//            $("#mhs").select2('open');
-//            jsfNotif('Peringatan', 'Masukkan NIM/Nama Mahasiswa dahulu', 2);
-//            return;
-//        }
-//        if(!selected.status){
-//            jsfNotif('Peringatan', 'Status Mahasiswa pada PDDikti : TIDAK AKTIF !', 2);
-//            return;
-//        }
-//        jsfRequest(module + "/ajax/type/list/source/akm", "POST",
-//            { id: id }, {useLoading: true})
-//        .done(function(rs) {
-//            if (rs.status) {
-//                $("#sks").val(rs.data.sks);
-//                $("#ipk").val(rs.data.ipk);
-//                $(".is-akm").html(rs.data.akm);
-//            } else {
-//                $("#sks, #ipk").val('');
-//                $(".is-akm").html('');
-//                jsfNotif('Peringatan', rs.msg, 2);
-//            }
-//        })
-//        .fail(function(err) {
-//            console.error("load:", err);
-//        });
-//    }
-//    function load_select() {
-//        $("#mhs").select2({
-//            placeholder: "Masukkan NIM/Nama Mahasiswa",
-//            minimumInputLength: 3,
-//            ajax: {
-//                url: module + "/ajax/type/list/source/nim",
-//                type: "POST",
-//                dataType: 'json',
-//                delay: 250,
-//                data: function (key) {
-//                    return { key: key };
-//                },
-//                results: function (data) {
-//                    return { results: data };
-//                },
-//                cache: true
-//            },
-//            initSelection: function(element, callback) {
-//                var id = $(element).val();
-//                if (id !== "") {
-//                    $.ajax(module + "/ajax/type/list/source/nim?id=" + id, {
-//                        dataType: "json"
-//                    }).done(function(data) { 
-//                        callback(data[0]);
-//                        $("#txt-mhs").html(data[0].text);
-//                    });
-//                }
-//            }
-//        });
-//    }
-//    function validate_form(){
-//        jsfValidate("#validation-form", {
-//            mhs: { required: true },
-//            periode: { required: true },
-//            sks: {
-//                required: true, digits: true,
-//                min:0, max:200
-//            },
-//            ipk: {
-//                required: true, number: true,
-//                min:0, max:4
-//            },
-//            status: {
-//                required: {
-//                    depends: function(e) {
-//                        return $.trim($("#idmhs").val()) !== "";
-//                    }
-//                }
-//            },
-//            rpl: {
-//                required: {
-//                    depends: function(e) {
-//                        return $.trim($("#status").val()) === "RPL";
-//                    }
-//                }
-//            },
-//            'akm_check[]': { 
-//                //required: true
-//            },
-//            'akm_select[]': { 
-//                //required: true
-//            },
-//            note: {
-//                minlength: 5
-//            }
-//        });
-//    }
+    function checkLocation(lat, lng) {
+        jsfRequest(module + "/ajax/type/action/source/location", "POST",
+            { 
+                latitude: lat, longitude: lng
+            }, {useLoading: true})
+        .done(function(rs) {
+            if (rs.status) {
+                $("#lokasi").val(rs.data);
+                
+                $("#btn-gps").attr("disabled", "disabled");
+                jsfNotif("Informasi", rs.msg, 1);
+            } else {
+                $("#btn-gps").removeAttr("disabled");
+                jsfNotif('Peringatan', rs.msg, 2, 'swal');
+            }
+        })
+        .fail(function(err) {
+            console.error("load:", err);
+        });
+    }
+    function validateForm(){
+        jsfValidate("#validation-form", {
+            rules: {
+                status: { required: true },
+                lokasi: { required: true },
+                latitude: {
+                    required: true
+                },
+                longitude: {
+                    required: true
+                }
+            },
+            loadingDialog: false,
+            onValid: function(formEl) {
+                const dataURL = $("#foto").val();
+                const error = validateImage(dataURL);
+                if (error) {
+                    jsfNotif('Peringatan', error, 2, 'swal');
+                    return false;
+                }
+                const dataForm = $(formEl).serialize();
+                jsfRequest(module + "/ajax/type/action/source/presensi", "POST",
+                    dataForm,
+                    { useLoading: true })
+                .done(function(rs) {
+                    if (rs.status) {
+                        $(formEl).hide();
+                        jsfNotif("Informasi", rs.msg, 1, 'swal');
+                        
+                        setTimeout(function () {
+                            window.location.replace(module);
+                        }, 3000);
+                    } else {
+                        jsfNotif('Peringatan', rs.msg, 2, 'swal');
+                    }
+                    bootbox.hideAll();
+                })
+                .fail(function(err) {
+                    bootbox.hideAll();
+                    console.error("load:", err);
+                });
+                return false;
+            }
+        });
+    }
+    function validateImage(dataURL) {
+        if (!dataURL) return "Foto masih kosong";
+        // cek format
+        if (!dataURL.startsWith("data:image/")) {
+            return "Format harus gambar";
+        }
+        // cek mime type (opsional)
+        const allowed = ['image/jpeg', 'image/png', 'image/webp'];
+        let mime = dataURL.split(';')[0].replace('data:', '');
+
+        if (!allowed.includes(mime)) {
+            return "Format Foto tidak diizinkan";
+        }
+        // cek ukuran (approx base64 → byte)
+        let sizeInBytes = Math.round((dataURL.length * 3) / 4);
+        let maxSize = 2 * 1024 * 1024; // 2MB
+
+        if (sizeInBytes > maxSize) {
+            return "Ukuran Foto terlalu besar (max 2MB)";
+        }
+        return null;
+    }
 </script>

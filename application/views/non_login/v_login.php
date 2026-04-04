@@ -4,7 +4,7 @@
             <div class="space-10"></div>
             <div class="center">
                 <a class="no-hover" href="<?= site_url() ?>">
-                    <img class="blur-up lazyload" width="80" src="<?= load_file($app_session['logo']) ?>" />
+                    <img class="blur-up lazyload" width="100" src="<?= load_file($app_session['logo']) ?>" />
                 </a>
             </div>
             <div class="space-6"></div>
@@ -34,7 +34,7 @@
                                         <div class="block clearfix">
                                             <div class="input-group">
                                                 <input type="password" id="password" name="password" class="form-control" placeholder="Password" />
-                                                <span id="gshow" class="input-group-addon">
+                                                <span id="iconshow" class="input-group-addon">
                                                     <i class="ace-icon red fa fa-eye-slash"></i>
                                                 </span>
                                             </div>
@@ -62,7 +62,7 @@
 
                         <div class="toolbar clearfix web-color">
                             <div class="center">
-                                <a href="#" data-target="#forgot-box" class="hide forgot-password-link">
+                                <a href="#" data-target="#forgot-box" class="forgot-password-link hide">
                                     <i class="ace-icon fa fa-arrow-left"></i>
                                     Lupa Password ?
                                 </a>
@@ -79,7 +79,7 @@
                             </h4>
                             <div class="space-6"></div>
                             <p>Masukkan email yang telah terdaftar pada aplikasi. Password baru akan dikirim melalui email anda.</p>
-                            <form id="validation-forgot" name="form-forgot" method="POST" action="#">
+                            <form id="forgot-form" name="forgot-form" method="POST" action="#">
                                 <fieldset>
                                     <div class="form-group">
                                         <label class="block clearfix">
@@ -114,155 +114,82 @@
 <?php
     echo $script_captcha;
     load_js(array(
-        'theme/aceadmin/assets/js/bootbox.min.js',
-        'theme/aceadmin/assets/js/jquery.validate.js',
-        'theme/aceadmin/sweetalert.min.js'
+        'theme/aceadmin/assets/js/jquery.validate.js'
     ));
 ?>
 <script type="text/javascript">
     const module = "<?= site_url($module) ?>";
     $(document).ready(function() {
-        $('#username').focus();
-        $.validator.addMethod("recaptchaValid", function(value, element, params) {
-            const response = grecaptcha.getResponse(); // Ambil token reCAPTCHA
-            return response.length > 0; // Valid jika ada token
-        }, "Centang atau selesaikan CAPTCHA terlebih dahulu");
+        $("#username").focus();
+        validateForm();
     });
     $(document).on('click', 'a[data-target]', function(e) {
         e.preventDefault();
         var target = $(this).data('target');
-        $('.widget-box.visible').removeClass('visible');//hide others
-        $(target).addClass('visible');//show target
+        $('.widget-box.visible').removeClass('visible');
+        $(target).addClass('visible');
     });
-    $("#gshow").on("click", function(e) {
+    $(document).on('click', '#iconshow', function(e) {
         var pass = $("#password");
         if(pass.attr('type') === 'password') {
             pass.attr('type','text');
-            $("#gshow > i").removeClass('red fa-eye-slash').addClass('blue fa-eye');
+            $("#iconshow > i").removeClass('red fa-eye-slash').addClass('blue fa-eye');
         }else{
             pass.attr('type','password');
-            $("#gshow > i").removeClass('blue fa-eye').addClass('red fa-eye-slash');
+            $("#iconshow > i").removeClass('blue fa-eye').addClass('red fa-eye-slash');
         }
     });
 </script>
 <script type="text/javascript">
-    $("#login-form").submit(function (e) {
-        e.preventDefault();
-        const valid = $(this).validate().checkForm();
-        if (!valid) {
-            return;
-        }
-        var title = '<h4 class="blue center"><i class="ace-icon fa fa fa-spin fa-spinner"></i> Mohon tunggu . . . </h4>';
-        var msg = '<p class="center red bigger-120"><i class="ace-icon fa fa-hand-o-right blue"></i>' +
-                ' Jangan menutup atau me-refresh halaman ini, silahkan tunggu sampai peringatan ini tertutup sendiri. </p>';
-        var progress = bootbox.dialog({title: title, message: msg, closeButton: false});
-        $.ajax({
-            url: module + "/ajax/type/action/source/auth",
-            dataType: "json",
-            type: "POST",
-            data: $(this).serialize(),
-            success: function (rs) {
-                if (rs.status) {
-                    setTimeout(function () {
-                        progress.modal("hide");
-                        window.location.replace(rs.data);
-                    },2000);
-                    swal('Informasi', rs.msg, 'success');
-                } else {
-                    progress.modal("hide");
-                    swal('Peringatan', rs.msg, 'error');
+    function validateForm(){
+        $.validator.addMethod("recaptchaValid", function(value, element, params) {
+            const response = grecaptcha.getResponse();
+            return response.length > 0;
+        }, "Centang atau selesaikan CAPTCHA terlebih dahulu");
+        
+        jsfValidate("#login-form", {
+            rules: {
+                username: {
+                    required: true,
+                    minlength: 5
+                },
+                password: {
+                    required: true,
+                    minlength: 5
+                },
+                "g-recaptcha-response": {
+                    recaptchaValid: true
                 }
-                grecaptcha.reset();
             },
-            error: function (xhr, ajaxOptions, thrownError) {
-                progress.modal("hide");
-                grecaptcha.reset();
-                console.log('Error : ' + xhr.responseText);
+            onValid: function(formEl) {
+                const dataForm = $(formEl).serialize();
+                jsfRequest(module + "/ajax/type/action/source/auth", "POST",
+                    dataForm,
+                    { useLoading: true })
+                .done(function(rs) {
+                    if (rs.status) {
+                        jsfNotif('Informasi', rs.msg, 1, 'swal');
+                        setTimeout(() => window.location.replace(rs.data), 2000);
+                    } else {
+                        bootbox.hideAll();
+                        jsfNotif('Peringatan', rs.msg, 2, 'swal');
+                    }
+                    grecaptcha.reset();
+                })
+                .fail(function(err) {
+                    bootbox.hideAll();
+                    grecaptcha.reset();
+                    console.error("load:", err);
+                });
+                return false;
             }
         });
-    });
-    $("#login-form").validate({
-        errorElement: 'div',
-        errorClass: 'help-block',
-        focusInvalid: false,
-        ignore: "",
-        rules: {
-            username: {
-                required: true,
-                minlength: 5
-            },
-            password: {
-                required: true,
-                minlength: 5
-            },
-            "g-recaptcha-response": {
-                recaptchaValid: true
-            }
-        },
-        highlight: function(e) {
-            $(e).closest('.form-group').removeClass('has-success').addClass('has-error');
-        },
-        success: function(e) {
-            $(e).closest('.form-group').removeClass('has-error').addClass('has-success');
-            $(e).remove();
-        },
-        errorPlacement: function(error, element) {
-            if (element.is('input[type=checkbox]') || element.is('input[type=radio]')) {
-                var controls = element.closest('div[class*="col-"]');
-                if (controls.find(':checkbox,:radio').length > 1)
-                    controls.append(error);
-                else
-                    error.insertAfter(element.nextAll('.lbl:eq(0)').eq(0));
-            }
-            else if (element.is('.select2')) {
-                error.insertAfter(element.siblings('[class*="select2-container"]:eq(0)'));
-            }
-            else if (element.is('.chosen-select')) {
-                error.insertAfter(element.siblings('[class*="chosen-container"]:eq(0)'));
-            }
-            else
-                error.insertAfter(element.parent());
-        },
-        invalidHandler: function(form) {
-        }
-    });
-    $("#validation-forgot").validate({
-        errorElement: 'div',
-        errorClass: 'help-block',
-        focusInvalid: false,
-        ignore: "",
-        rules: {
+        jsfValidate("#forgot-form", {
             femail: {
                 required: true,
                 email: true,
                 minlength: 5
             }
-        },
-        highlight: function(e) {
-            $(e).closest('.form-group').removeClass('has-success').addClass('has-error');
-        },
-        success: function(e) {
-            $(e).closest('.form-group').removeClass('has-error').addClass('has-success');
-            $(e).remove();
-        },
-        errorPlacement: function(error, element) {
-            if (element.is('input[type=checkbox]') || element.is('input[type=radio]')) {
-                var controls = element.closest('div[class*="col-"]');
-                if (controls.find(':checkbox,:radio').length > 1)
-                    controls.append(error);
-                else
-                    error.insertAfter(element.nextAll('.lbl:eq(0)').eq(0));
-            }
-            else if (element.is('.select2')) {
-                error.insertAfter(element.siblings('[class*="select2-container"]:eq(0)'));
-            }
-            else if (element.is('.chosen-select')) {
-                error.insertAfter(element.siblings('[class*="chosen-container"]:eq(0)'));
-            }
-            else
-                error.insertAfter(element.parent());
-        },
-        invalidHandler: function(form) {
-        }
-    });
+        });
+    }
 </script>

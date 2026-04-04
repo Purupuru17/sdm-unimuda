@@ -59,14 +59,14 @@ class Login extends KZ_Controller {
         if ($routing_module['type'] == 'action') {
             //ACTION
             if ($routing_module['source'] == 'auth') {
-                $this->_auth_login();
+                $this->_authLogin();
             }else if ($routing_module['source'] == 'autoload') {
-                $this->_auto_module();
+                $this->_autoModule();
             }
         }
     }
     //function
-    function _auth_login() {
+    function _authLogin() {
         if(!$this->fungsi->Validation($this->rules,'ajax')){
             jsonResponse(array('status' => FALSE, 'msg' => validation_errors()));
         }
@@ -100,7 +100,7 @@ class Login extends KZ_Controller {
         jsonResponse(array('data' => site_url('beranda'), 'status' => TRUE, 
             'msg' => 'Selamat datang kembali, '.$data['fullname']));
     }
-    function _auto_module() {
+    function _autoModule() {
         $this->load->library(array('visitor'));
         
         $data = array();
@@ -140,14 +140,14 @@ class Login extends KZ_Controller {
         }
         jsonResponse(array('data' => $data, 'html' => $html, 'item' => $result['rows'] ,'status' => true));
     }
-    function _captcha_google($str){
+    function _captchaGoogle($str){
         $this->load->library(array('recaptcha'));
         
         $result = $this->recaptcha->verifyResponse($str);
         if($result['success']){
             return TRUE;
         }else{
-            $this->form_validation->set_message('_captcha_google', 'Berikan tanda centang terlebih dahulu');
+            $this->form_validation->set_message('_captchaGoogle', 'Centang atau selesaikan CAPTCHA terlebih dahulu');
             return FALSE;
         }
     }
@@ -163,7 +163,7 @@ class Login extends KZ_Controller {
         ),array(
             'field' => 'g-recaptcha-response',
             'label' => 'Pengecekan Keamanan',
-            'rules' => 'required|trim|xss_clean|callback__captcha_google' 
+            'rules' => 'required|trim|xss_clean|callback__captchaGoogle' 
         )
     );
 }

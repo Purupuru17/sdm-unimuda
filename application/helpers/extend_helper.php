@@ -48,11 +48,10 @@ if (!function_exists('st_aktif')) {
 if (!function_exists('st_mhs')) {
 
     function st_mhs($value, $type = NULL) {
-        $warning = array('LAINNYA','MUTASI','PROSES','SAKIT','PRAKTIKUM','CUTI');
-        $info = array('LULUS','IZIN','OFFLINE','VALID','RPL-AJUAN');
-        $success = array('AKTIF','HADIR','ONLINE','SELESAI','RPL-VALID');
-        $danger = array('DIKELUARKAN','WAFAT','PUTUS SEKOLAH','MENGUNDURKAN DIRI',
-            'HILANG','TIDAK AKTIF','TUNDA','PINDAH-PRODI');
+        $warning = array('PROSES');
+        $info = array('VALID');
+        $success = array('AKTIF','SELESAI','TEPAT WAKTU');
+        $danger = array('TIDAK AKTIF','TERLAMBAT');
         
         if (in_array($value, $info)) {
             $status = '<span class="label label-info arrowed-in-right arrowed">'.$value.'</span>';
