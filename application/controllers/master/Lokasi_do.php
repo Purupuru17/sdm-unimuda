@@ -70,7 +70,7 @@ class Lokasi_do extends KZ_Controller {
         ),array(
             'field' => 'status',
             'label' => 'Status',
-            //'rules' => 'required|trim|xss_clean'
+            'rules' => 'required|trim|xss_clean'
         )
     );    
 }

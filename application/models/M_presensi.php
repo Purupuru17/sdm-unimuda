@@ -12,7 +12,7 @@ class M_presensi extends KZ_Model {
             'alias'      => 'p',
             'select'     => 'p.*, pg.nama, pg.nik',
             'join'       => [ ['m_pegawai pg','pg.id_pegawai = p.pegawai_id','left'] ],
-            'columns'    => [null,'nama','status_presensi','tgl_presensi','waktu_masuk','waktu_pulang','created_at',null],
+            'columns'    => [null,'nama','tgl_presensi','waktu_masuk','status_presensi','waktu_pulang',null],
             'searchable' => ['nik','nama'],
             'order'      => ['created_at' => 'desc']
         ];
@@ -40,10 +40,10 @@ class M_presensi extends KZ_Model {
                     class="btn btn-white btn-info btn-mini btn-round"> <i class="ace-icon fa fa-image"></i>
                 </a>';
             $btn_pulang = '<a href="https://www.google.com/maps/search/?api=1&query='.$items['latitude_pulang'].','.$items['longitude_pulang'].'" 
-                    target="_blank" class="orange"> <small>'.$items['lokasi_pulang'].'</small>
+                    target="_blank" class=""> <small>'.$items['lokasi_pulang'].'</small>
                 </a>';
             $btn_pulang .= empty($items['foto_pulang']) ? '' : ' <a href="#" itemid="'. load_file($items['foto_pulang']) .'" id="imgPulang-btn" 
-                    class="btn btn-white btn-warning btn-mini btn-round"> <i class="ace-icon fa fa-image"></i>
+                    class="btn btn-white btn-info btn-mini btn-round"> <i class="ace-icon fa fa-image"></i>
                 </a>';
             $jam_kerja = $this->_jamKerja($items['waktu_masuk'], $items['waktu_pulang']);
             
@@ -51,9 +51,9 @@ class M_presensi extends KZ_Model {
             $row[] = ctk($no);
             $row[] = '<strong>'.ctk($items['nama']).'</strong><br><span class="grey">'.ctk($items['nik']).'</span>';
             $row[] = format_date($items['tgl_presensi'])
-                .'<br> <small>Jam Kerja</small> : <strong class="green">'.$jam_kerja.'</strong>';
-            $row[] = '<strong class="blue">'.$items['waktu_masuk'].'</strong><br>'.$btn_masuk;
-            $row[] = st_mhs($items['status_presensi']).'<br>'.$items['catat_presensi'];
+                .'<br> <small>Jam Kerja</small> : <strong class="blue">'.$jam_kerja.'</strong>';
+            $row[] = '<strong class="green">'.$items['waktu_masuk'].'</strong><br>'.$btn_masuk;
+            $row[] = st_mhs($items['status_presensi']).'<br><small>'.$items['catat_presensi'].'</small>';
             $row[] = '<strong class="orange">'.$items['waktu_pulang'].'</strong><br>'.$btn_pulang;
             $row[] = '<div class="action-buttons">'.$btn_aksi.'</div>';
 

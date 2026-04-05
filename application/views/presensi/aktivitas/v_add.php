@@ -1,6 +1,6 @@
 <?php $this->load->view('sistem/v_breadcrumb'); ?>
 <div class="page-content">
-    <div class="page-header">
+    <div class="page-header hide">
         <h1>
             <?= $title[1] ?>
             <small>
@@ -15,12 +15,12 @@
         </div>
         <div class="col-xs-12">
             <h3 class="lighter center block blue">
-                Presensi Aktivitas Kerja <br>[ <span class="is-clock"><?= format_date(date('Y-m-d H:i:s'),0) ?></span> ]
+                Presensi Aktivitas Kerja <br>[ <small class="is-clock"><?= format_date(date('Y-m-d H:i:s'),0) ?></small> ]
             </h3>
             <div class="space-10"></div>
             <form id="validation-form" action="#" name="form" class="form-horizontal" method="POST" enctype="multipart/form-data">
                 <div class="form-group">
-                    <label class="control-label col-xs-12 col-sm-4 no-padding-right">
+                    <label class="control-label col-xs-12 col-sm-5 no-padding-right">
                         <button onclick="restartGPS()" id="btn-gps" disabled="disabled"
                             class="btn btn-bold btn-primary btn-white btn-sm" type="button">
                             <i class="ace-icon fa fa-map-marker bigger-120"></i>
@@ -29,36 +29,37 @@
                     </label>
                     <div class="col-xs-12 col-sm-6">
                         <div class="space-2"></div>
-                        <span class="input-icon">
-                            <input value="" type="text" name="latitude" id="latitude" placeholder="Latitude" class="input-medium bolder"/>
-                        </span>
-                        <span class="input-icon input-icon-right">
-                            <input value="" type="text" name="longitude" id="longitude" placeholder="Longitude" class="input-medium bolder"/>
-                        </span>
-                    </div>
-                    <span class="help-inline col-sm-8 col-sm-offset-4 col-xs-12">
-                        <span id="alamat" class="middle red">Mengambil alamat ...</span>
-                    </span>
-                </div>
-                <div class="form-group">
-                    <label class="control-label col-xs-12 col-sm-4 no-padding-right"></label>
-                    <div class="col-xs-12 col-sm-6">
                         <div class="clearfix">
-                            <input value="" type="text" name="lokasi" id="lokasi" class="col-xs-12 col-sm-6 bolder bigger-120" placeholder="Lokasi Presensi berdasarkan GPS" />
+                            <input value="" type="text" name="lokasi" id="lokasi" class="col-xs-12 col-sm-6 bolder bigger-110" placeholder="Lokasi Presensi berdasarkan GPS" />
                         </div>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="control-label col-xs-12 col-sm-4 no-padding-right">
+                    <label class="control-label col-xs-12 col-sm-5 no-padding-right"></label>
+                    <div class="col-xs-12 col-sm-6">
+                        <span class="input-icon">
+                            <input value="" type="text" name="latitude" id="latitude" placeholder="Latitude" class="input-medium"/>
+                        </span>
+                        <span class="input-icon input-icon-right">
+                            <input value="" type="text" name="longitude" id="longitude" placeholder="Longitude" class="input-medium"/>
+                        </span>
+                        <div class="space-2"></div>
+                    </div>
+                    <span class="help-inline col-sm-7 col-sm-offset-5 col-xs-12">
+                        <span id="alamat" class="middle blue">Mengambil alamat ...</span>
+                    </span>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-xs-12 col-sm-5 no-padding-right">
                         <button onclick="restartFoto()" id="btn-kamera"
                             class="btn btn-bold btn-warning btn-white btn-sm" type="button">
-                            <i class="ace-icon fa fa-camera bigger-120"></i>
+                            <i class="ace-icon fa fa-camera"></i>
                             Buka Kamera
                         </button>
                     </label>
-                    <div class="col-xs-12 col-sm-4">
+                    <div class="col-xs-12 col-sm-5">
                         <div class="clearfix">
-                            <video id="video" autoplay playsinline class="img-thumbnail" style="display: none; max-width: 350px"></video>
+                            <video id="video" autoplay playsinline class="img-thumbnail" style="display: none; max-width: 320px; transform: scaleX(-1)"></video>
                             <canvas id="canvas" style="display:none;"></canvas>
                             
                             <img id="preview" width="350" class="img-thumbnail" style="display: none">
@@ -68,27 +69,27 @@
                         <button onclick="takeFoto()" style="display: none" id="btn-foto"
                             class="btn btn-bold btn-success btn-white btn-sm" type="button">
                             <i class="ace-icon fa fa-camera bigger-120"></i>
-                            Ambil Foto
+                            Ambil Foto Selfie
                         </button>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="control-label col-xs-12 col-sm-4 no-padding-right bolder">Status <span class="red">*</span> :</label>
+                    <label class="control-label col-xs-12 col-sm-5 no-padding-right bolder">Status <span class="red">*</span> :</label>
                     <div class="col-xs-12 col-sm-7">
                         <div class="clearfix">
                             <label class="control-label">
                                 <input name="status" value="1" type="radio" class="ace input-lg" />
-                                <span class="lbl bolder blue bigger-120"> MASUK </span>
+                                <span class="lbl bolder blue"> MASUK </span>
                             </label>&nbsp;&nbsp;&nbsp;
                             <label class="control-label">
                                 <input name="status" value="2" type="radio" class="ace input-lg" />
-                                <span class="lbl bolder orange bigger-120"> PULANG </span>
+                                <span class="lbl bolder orange"> PULANG </span>
                             </label>
                         </div>
                     </div>
                 </div>
                 <div class="clearfix form-actions">
-                    <div class="col-sm-offset-4 col-sm-5">
+                    <div class="col-sm-offset-5 col-sm-5">
                         <button class="btn btn-success" name="simpan" type="submit">
                             <i class="ace-icon fa fa-paper-plane"></i>
                             Simpan Presensi
@@ -157,8 +158,8 @@ load_js(array(
                 navigator.geolocation.clearWatch(watchID);
                 
                 $("#btn-gps").removeAttr("disabled");
-                $("#alamat").html("GPS belum akurat. Silakan coba ulang.");
-                jsfNotif("Peringatan", "GPS belum akurat. Silakan coba ulang.", 2, 'swal');
+                $("#alamat").html("GPS tidak ditemukan. Silahkan coba ulang dengan klik tombol <b>GPS Lokasi</b>");
+                jsfNotif("Peringatan", "GPS tidak ditemukan. Silahkan coba ulang.", 2, 'swal');
             }
         },10000);
     }
@@ -217,7 +218,7 @@ load_js(array(
         startGPS();
     }
     // ================== Ambil Foto ==================
-    async function takeFoto() {
+    function takeFoto() {
         
         const username = "<?= $this->session->userdata('name') ?>";
         const lokasi = $("#lokasi").val();
@@ -245,7 +246,7 @@ load_js(array(
         ctx.fillText(new Date().toLocaleString(), 10, canvas.height - 40);
         ctx.fillText("Lokasi : " + lokasi, 10, canvas.height - 20);
         // ===== Compress =====
-        let quality = 0.7;
+        let quality = 0.5;
         let dataURL = canvas.toDataURL('image/jpeg', quality);
         // ===== preview =====
         let preview = document.getElementById("preview");
@@ -262,6 +263,11 @@ load_js(array(
         jsfNotif('Informasi', 'Foto berhasil', 1);
     }
     function restartFoto() {
+        const lokasi = $("#lokasi").val();
+        if(!lokasi){
+            jsfNotif('Peringatan', 'Lokasi tidak ditemukan', 2, 'swal');
+            return;
+        }
         $("#preview").hide();
         $("#video").show();
         $("#foto").val("");
@@ -282,7 +288,7 @@ load_js(array(
 </script>
 <script type="text/javascript">
     function checkLocation(lat, lng) {
-        jsfRequest(module + "/ajax/type/action/source/location", "POST",
+        jsfRequest(module + "_do/ajax/type/action/source/location", "POST",
             { 
                 latitude: lat, longitude: lng
             }, {useLoading: true})
@@ -322,7 +328,7 @@ load_js(array(
                     return false;
                 }
                 const dataForm = $(formEl).serialize();
-                jsfRequest(module + "/ajax/type/action/source/presensi", "POST",
+                jsfRequest(module + "_do/ajax/type/action/source/presensi", "POST",
                     dataForm,
                     { useLoading: true })
                 .done(function(rs) {

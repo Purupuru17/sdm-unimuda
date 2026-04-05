@@ -9,7 +9,7 @@ class Home extends KZ_Controller {
         parent::__construct();
     }
     function index() {
-//        empty($this->sessionid) ? redirect('login') : redirect('beranda');
+        empty($this->sessionid) ? redirect('login') : redirect('beranda');
         
         $this->data['module'] = $this->module;
         $this->load_home('h_home', $this->data);

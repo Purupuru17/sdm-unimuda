@@ -96,9 +96,9 @@ class Kerja extends KZ_Controller {
             
             $row = [];  
             $row[] = ctk($no);
-            $row[] = '<strong class="blue">'. strtoupper(format_day($items['hari_kerja'])).'</strong>';
-            $row[] = '<strong>'.$items['masuk_kerja'].'</strong>';
-            $row[] = '<strong>'.$items['pulang_kerja'].'</strong>';
+            $row[] = '<strong>'. strtoupper(format_day($items['hari_kerja'])).'</strong>';
+            $row[] = $items['masuk_kerja'];
+            $row[] = $items['pulang_kerja'];
             $row[] = '<strong class="red">'.$items['limit_kerja'].'</strong> menit';
             $row[] = '<div class="action-buttons">'.$btn_aksi.'</div>';
 

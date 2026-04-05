@@ -146,7 +146,6 @@
             const response = grecaptcha.getResponse();
             return response.length > 0;
         }, "Centang atau selesaikan CAPTCHA terlebih dahulu");
-        
         jsfValidate("#login-form", {
             rules: {
                 username: {

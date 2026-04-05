@@ -55,11 +55,11 @@ $this->load->view('sistem/v_breadcrumb');
                     <div class="col-xs-12 col-sm-7">
                         <div class="clearfix">
                             <label class="control-label">
-                                <input name="status" value="1" type="radio" class="ace" />
+                                <input <?= ($edit['status_lokasi'] == '1') ? 'checked' : '' ; ?> name="status" value="1" type="radio" class="ace" />
                                 <span class="lbl"> AKTIF </span>
                             </label>&nbsp;&nbsp;&nbsp;
                             <label class="control-label">
-                                <input name="status" value="0" type="radio" class="ace" />
+                                <input <?= ($edit['status_lokasi'] == '0') ? 'checked' : '' ; ?> name="status" value="0" type="radio" class="ace" />
                                 <span class="lbl"> TIDAK AKTIF </span>
                             </label>
                         </div>

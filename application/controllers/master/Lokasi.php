@@ -96,7 +96,7 @@ class Lokasi extends KZ_Controller {
             
             $row = [];  
             $row[] = ctk($no);
-            $row[] = '<strong class="blue">'.ctk($items['nama_lokasi']).'</strong>';
+            $row[] = '<strong>'.ctk($items['nama_lokasi']).'</strong>';
             $row[] = '<a href="https://www.google.com/maps/search/?api=1&query='.$items['latitude'].','.$items['longitude'].'" 
                     target="_blank">'.$items['latitude'].', '.$items['longitude'].'</a>';
             $row[] = '<strong class="red">'.ctk($items['radius']).'</strong> meter';
