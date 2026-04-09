@@ -113,10 +113,9 @@ $this->load->view('sistem/v_breadcrumb');
                                 <tr>
                                     <th>#</th>
                                     <th>Pegawai</th>
-                                    <th>Tanggal</th>
-                                    <th>Masuk</th>
-                                    <th>Status</th>
-                                    <th>Pulang</th>
+                                    <th>Presensi</th>
+                                    <th>Lokasi</th>
+                                    <th>Agenda</th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
@@ -149,20 +148,6 @@ $this->load->view('sistem/v_breadcrumb');
         });
         loadIndex();
         getSelect();
-    });
-    $(document.body).on("click", "#imgMasuk-btn", function(e) {
-        e.preventDefault();
-        const id = $(this).attr("itemid");
-        const title = "<h4 class='blue center'><i class='ace-icon fa fa-image'></i> Foto Masuk </h4>";
-        const msg = `<p class="center"><img src="${id}" class="img-thumbnail" width="100%"/> </p>`;
-        bootbox.dialog({ title: title, message: msg, closeButton: true });
-    });
-    $(document.body).on("click", "#imgPulang-btn", function(e) {
-        e.preventDefault();
-        const id = $(this).attr("itemid");
-        const title = "<h4 class='orange center'><i class='ace-icon fa fa-image'></i> Foto Pulang </h4>";
-        const msg = `<p class="center"><img src="${id}" class="img-thumbnail" width="100%"/> </p>`;
-        bootbox.dialog({ title: title, message: msg, closeButton: true });
     });
     $(document.body).on("click", "#delete-btn", function(e) {
         e.preventDefault();
@@ -201,10 +186,10 @@ $this->load->view('sistem/v_breadcrumb');
                 }
             },
             aoColumnDefs: [
-                {bSortable: false, aTargets: [0,6]},
-                {bSearchable: false, aTargets: [0,6]},
-                {sClass: "center", aTargets: [0, 1, 2, 3, 4, 5]},
-                {sClass: "center nowrap", aTargets: [6]}
+                {bSortable: false, aTargets: [0,5]},
+                {bSearchable: false, aTargets: [0,5]},
+                {sClass: "center", aTargets: [0, 1, 2, 3, 4]},
+                {sClass: "center nowrap", aTargets: [5]}
             ]
         }).init();
         $("#btn-search").click(function () {

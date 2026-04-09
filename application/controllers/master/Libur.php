@@ -1,62 +1,62 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Lokasi extends KZ_Controller {
+class Libur extends KZ_Controller {
     
-    private $module = 'master/lokasi';
-    private $module_do = 'master/lokasi_do';    
+    private $module = 'master/libur';
+    private $module_do = 'master/libur_do';    
     private $url_route = array('id', 'source', 'type');
     
     function __construct() {
         parent::__construct();
-        $this->load->model(array('m_lokasi'));
+        $this->load->model(array('m_libur'));
     }
     function index() {
         $this->data['module'] = $this->module;
-        $this->data['title'] = array('Lokasi','List Data');
+        $this->data['title'] = array('Hari Libur','List Data');
         $this->data['breadcrumb'] = array( 
             array('title' => $this->uri->segment(1), 'url'=>'#'),
             array('title' => $this->uri->segment(2), 'url'=> '')
         );
-        $this->load_view('master/lokasi/v_index', $this->data);
+        $this->load_view('master/libur/v_index', $this->data);
     }
     function add() {
-        $this->data['edit'] = $this->m_lokasi->getEmpty();
+        $this->data['edit'] = $this->m_libur->getEmpty();
         
         $this->data['action'] = $this->module_do.'/add';
-        $this->data['title'] = array('Lokasi','Tambah Data');
+        $this->data['title'] = array('Hari Libur','Tambah Data');
         $this->data['breadcrumb'] = array( 
             array('title' => $this->uri->segment(1), 'url'=>'#'),
             array('title' => $this->uri->segment(2), 'url'=> site_url($this->module)),
             array('title' => $this->data['title'][1], 'url'=>'')
         );
-        $this->load_view('master/lokasi/v_form', $this->data);
+        $this->load_view('master/libur/v_form', $this->data);
     }
     function edit($id = NULL) {
         if(empty(decode($id))){
             redirect($this->module);
         }
-        $this->data['edit'] = $this->m_lokasi->get(decode($id));
+        $this->data['edit'] = $this->m_libur->get(decode($id));
         
         $this->data['action'] = $this->module_do.'/edit/'.$id;
-        $this->data['title'] = array('Lokasi','Ubah Data');
+        $this->data['title'] = array('Hari Libur','Ubah Data');
         $this->data['breadcrumb'] = array( 
             array('title' => $this->uri->segment(1), 'url'=>'#'),
             array('title' => $this->uri->segment(2), 'url'=> site_url($this->module)),
             array('title' => $this->data['title'][1], 'url'=>'')
         );
-        $this->load_view('master/lokasi/v_form', $this->data);
+        $this->load_view('master/libur/v_form', $this->data);
     }
     function delete() {
         $id = decode($this->input->post('id'));
         if(empty($id)){
             redirect($this->module);
         }
-        $get = $this->m_lokasi->get($id);
+        $get = $this->m_libur->get($id);
         if(empty($get)){
             $this->session->set_flashdata('notif', notif('warning', 'Peringatan', 'Data tidak ditemukan'));
             redirect($this->module);
         }
-        $result = $this->m_lokasi->delete($id);
+        $result = $this->m_libur->delete($id);
         if ($result) {
             $this->session->set_flashdata('notif', notif('success', 'Informasi', 'Data berhasil dihapus'));
             redirect($this->module);
@@ -79,29 +79,25 @@ class Lokasi extends KZ_Controller {
     }
     function _tableIndex() {
         $where = [];
-        $result = $this->m_lokasi->all($where, ['order' => 'nama_lokasi ASC']); 
+        $result = $this->m_libur->all($where, ['order' => 'tgl_libur DESC']); 
         if($result['rows'] < 1){
             jsonResponse(array('status' => false, 'msg' => 'Data tidak ditemukan'));
         }
         $data = array('table' => []);
         $no = 1;
         foreach ($result['data'] as $items) {
-            $btn_aksi = '<a href="'. site_url($this->module.'/edit/'. encode($items['id_lokasi'])) .'" 
+            $btn_aksi = '<a href="'. site_url($this->module.'/edit/'. encode($items['id_libur'])) .'" 
                     class="tooltip-warning btn btn-white btn-warning btn-sm btn-round" data-rel="tooltip" title="Ubah Data">
                     <span class="orange"><i class="ace-icon fa fa-pencil-square-o bigger-120"></i></span>
-                </a><a href="#" itemid="'. encode($items['id_lokasi']) .'" itemprop="'. ctk($items['nama_lokasi']) .'" id="delete-btn" 
+                </a><a href="#" itemid="'. encode($items['id_libur']) .'" itemprop="'. ctk($items['tgl_libur']) .'" id="delete-btn" 
                     class="tooltip-error btn btn-white btn-danger btn-mini btn-round" data-rel="tooltip" title="Hapus Data">
                     <span class="red"><i class="ace-icon fa fa-trash-o"></i></span>
                 </a>';
             
             $row = [];  
             $row[] = ctk($no);
-            $row[] = '<strong>'.ctk($items['nama_lokasi']).'</strong>';
-            $row[] = '<a href="https://www.google.com/maps/search/?api=1&query='.$items['latitude'].','.$items['longitude'].'" 
-                    target="_blank">'.$items['latitude'].', '.$items['longitude'].'</a>';
-            $row[] = '<strong class="red">'.ctk($items['radius']).'</strong> meter';
-            $row[] = st_aktif($items['jenis_lokasi']);
-            $row[] = st_aktif($items['status_lokasi']);
+            $row[] = '<strong>'. strtoupper(format_date($items['tgl_libur'])).'</strong>';
+            $row[] = $items['catat_libur'];
             $row[] = '<div class="action-buttons">'.$btn_aksi.'</div>';
 
             $data['table'][] = $row;

@@ -16,6 +16,16 @@ class M_pegawai extends KZ_Model {
         $this->db->trans_complete();
         return $this->db->trans_status();
     }
+    function updateAkun($id, $data, $user)
+    {
+        $this->db->trans_start();
+        
+        $this->db->insert('yk_user', $user);
+        parent::update($id, $data);
+        
+        $this->db->trans_complete();
+        return $this->db->trans_status();
+    }
     function getDatatables($where = [], $param = []) 
     {
         $options = [
@@ -38,6 +48,10 @@ class M_pegawai extends KZ_Model {
                     class="tooltip-error btn btn-white btn-danger btn-mini btn-round" data-rel="tooltip" title="Hapus Data">
                     <span class="red"><i class="ace-icon fa fa-trash-o"></i></span>
                 </a>';
+            $btn_aksi .= empty($items['user_id']) ? '<a href="#" itemid="'. encode($items['id_pegawai']) .'" itemprop="'. ctk($items['nama']) .'" id="akun-btn" 
+                    class="tooltip-success btn btn-white btn-success btn-mini btn-round" data-rel="tooltip" title="Buat Akun">
+                    <span class="green"><i class="ace-icon fa fa-user-plus"></i></span>
+                </a>' : '';
                        
             $row = [];
             $row[] = ctk($no);
@@ -63,8 +77,30 @@ class M_pegawai extends KZ_Model {
             $this->id => null,
             'user_id' => null,
             'nama' => null,
+            'nama_gelar' => null,
             'nik' => null,
-            'status' => null
+            'nidn' => null,
+            'nuptk' => null,
+            'jenis_kelamin' => null,
+            'tempat_lahir' => null,
+            'tgl_lahir' => null,
+            'agama' => null,
+            'telepon' => null,
+            'email' => null,
+            'pendidikan' => null,
+            'status_nikah' => null,
+            'jumlah_anak' => null,
+            'tgl_pegawai' => null,
+            'status_pegawai' => null,
+            'jenis_pegawai' => null,
+            'pangkat' => null,
+            'akademik' => null,
+
+            'unit_id' => null,
+            'jabatan_id' => null,
+            
+            'alamat' => null,
+            'update_at' => null
         ];
     }
 }

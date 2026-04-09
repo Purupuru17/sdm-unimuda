@@ -160,6 +160,7 @@
                     recaptchaValid: true
                 }
             },
+            loadingDialog: false,
             onValid: function(formEl) {
                 const dataForm = $(formEl).serialize();
                 jsfRequest(module + "/ajax/type/action/source/auth", "POST",

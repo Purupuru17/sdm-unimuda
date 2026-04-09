@@ -16,22 +16,6 @@ $this->load->view('sistem/v_breadcrumb');
             <?= $this->session->flashdata('notif'); ?>
         </div>
         <div class="col-xs-12">
-            <form id="search-form" action="<?= site_url($module.'/export') ?>" name="form" class="form-horizontal" method="POST">
-                <div class="form-group">
-                    <div class="col-md-offset-2 col-md-6">
-                        <button class="btn btn-primary btn-white btn-bold" name="cari" id="btn-search" type="button">
-                            <i class="ace-icon fa fa-search-plus"></i>
-                            Pencarian
-                        </button>
-                        <button class="btn btn-success btn-white btn-bold hide" name="export" id="btn-export" type="submit">
-                            <i class="ace-icon fa fa-file-excel-o"></i>
-                            Export
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </div>
-        <div class="col-xs-12">
             <div class="widget-box widget-color-blue2">
                 <div class="widget-header">
                     <h5 class="widget-title bigger lighter">
@@ -52,10 +36,8 @@ $this->load->view('sistem/v_breadcrumb');
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>Nama</th>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
+                                    <th>Tanggal</th>
+                                    <th>Catatan</th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
@@ -79,6 +61,7 @@ load_js(array(
     const module = "<?= site_url($module) ?>";
     let indexTable;
     $(document).ready(function () {
+        tableManager();
         loadIndex();
     });
     $(document.body).on("click", "#delete-btn", function(e) {
@@ -102,46 +85,24 @@ load_js(array(
             }
         });
     });
-    $(document.body).on("click", "#akun-btn", function(e) {
-        e.preventDefault();
-        var id = $(this).attr("itemid");
-        var name = $(this).attr("itemprop");
-        var title = "<h4 class='green center'><i class='ace-icon fa fa-user-secret'></i> Buat Akun </h4>";
-        var msg = "<p class='center grey bigger-120'><i class='ace-icon fa fa-hand-o-right blue'></i>" + 
-                " Apakah anda yakin akan membuat Akun : <br/><b>" + name + "</b> ? </p>";
-        bootbox.confirm({ title: title, message: msg, 
-            buttons: {
-                cancel: { label: "<i class='ace-icon fa fa-times bigger-110'></i> Batal", className: "btn btn-sm" },
-                confirm: { label: "<i class='ace-icon fa fa-check bigger-110'></i> Ya, Buat", className: "btn btn-sm btn-success"}
-            },
-            callback: function(result) {
-                if (result === true) {
-                    window.location.replace(module + "_do/add/" + id);
+    function loadIndex(){
+        indexTable.loadData(
+            module + "/ajax/type/table/source/index", {  },
+            function (rs) {
+                if (!rs.status) {
+                    jsfNotif("Peringatan", rs.msg, 2);
                 }
             }
-        });
-    });
-    function loadIndex() {
-        const indexTable = new DataTableManager("#index-table", {
-            bServerSide: true,
-            ajax: {
-                url: module + "/ajax/type/table/source/index",
-                type: "POST",
-                data: function (val) {
-                    val.tanggal = $("#tanggal").val();
-                    val.pegawai = $("#pegawai").val();
-                    val.status = $("#status").val();
-                }
-            },
+        );
+    }
+    function tableManager() {
+        indexTable = new DataTableManager("#index-table", {
             aoColumnDefs: [
-                {bSortable: false, aTargets: [0,5]},
-                {bSearchable: false, aTargets: [0,5]},
-                {sClass: "center", aTargets: [0, 1, 2, 3, 4]},
-                {sClass: "center nowrap", aTargets: [5]}
+                {bSortable: false, aTargets: [0,3]},
+                {bSearchable: false, aTargets: [0,3]},
+                {sClass: "center", aTargets: [0, 1, 2]},
+                {sClass: "center nowrap", aTargets: [3]}
             ]
         }).init();
-        $("#btn-search").click(function () {
-            indexTable.reload();
-        });
     }
 </script>     

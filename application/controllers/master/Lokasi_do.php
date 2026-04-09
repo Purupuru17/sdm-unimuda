@@ -18,6 +18,7 @@ class Lokasi_do extends KZ_Controller {
         $data['longitude'] = $this->input->post('longitude');
         $data['radius'] = (int) $this->input->post('radius');
         $data['status_lokasi'] = $this->input->post('status');
+        $data['jenis_lokasi'] = $this->input->post('jenis');
         
         $result = $this->m_lokasi->insert($data);
         if ($result) {
@@ -40,6 +41,7 @@ class Lokasi_do extends KZ_Controller {
         $data['longitude'] = $this->input->post('longitude');
         $data['radius'] = (int) $this->input->post('radius');
         $data['status_lokasi'] = $this->input->post('status');
+        $data['jenis_lokasi'] = $this->input->post('jenis');
         
         $result = $this->m_lokasi->update(decode($id), $data);
         if ($result) {
@@ -67,6 +69,10 @@ class Lokasi_do extends KZ_Controller {
             'field' => 'radius',
             'label' => 'Radius',
             'rules' => 'required|trim|xss_clean|is_natural|greater_than_equal_to[10]|less_than_equal_to[100]'
+        ),array(
+            'field' => 'jenis',
+            'label' => 'Jenis',
+            'rules' => 'required|trim|xss_clean'
         ),array(
             'field' => 'status',
             'label' => 'Status',

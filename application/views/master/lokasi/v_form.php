@@ -22,7 +22,7 @@ $this->load->view('sistem/v_breadcrumb');
                     <label class="control-label col-xs-12 col-sm-5 no-padding-right">Lokasi :</label>
                     <div class="col-xs-12 col-sm-4">
                         <div class="clearfix">
-                            <input value="<?= $edit['nama_lokasi'] ?>" type="text" name="nama" id="nama" placeholder="Nama Lokasi" class="col-xs-12 col-sm-6 input-sm"/>
+                            <input value="<?= $edit['nama_lokasi'] ?>" type="text" name="nama" id="nama" placeholder="Nama Lokasi" class="col-xs-12 col-sm-6"/>
                         </div>
                     </div>
                 </div>
@@ -30,7 +30,7 @@ $this->load->view('sistem/v_breadcrumb');
                     <label class="control-label col-xs-12 col-sm-5 no-padding-right">Latitude :</label>
                     <div class="col-xs-12 col-sm-3">
                         <div class="clearfix">
-                            <input value="<?= $edit['latitude'] ?>" type="text" name="latitude" id="latitude" placeholder="Latitude" class="col-xs-12 col-sm-6 input-sm"/>
+                            <input value="<?= $edit['latitude'] ?>" type="text" name="latitude" id="latitude" placeholder="Latitude" class="col-xs-12 col-sm-6"/>
                         </div>
                     </div>
                 </div>
@@ -38,7 +38,7 @@ $this->load->view('sistem/v_breadcrumb');
                     <label class="control-label col-xs-12 col-sm-5 no-padding-right">Longitude :</label>
                     <div class="col-xs-12 col-sm-3">
                         <div class="clearfix">
-                            <input value="<?= $edit['longitude'] ?>" type="text" name="longitude" id="longitude" placeholder="Longitude" class="col-xs-12 col-sm-6 input-sm"/>
+                            <input value="<?= $edit['longitude'] ?>" type="text" name="longitude" id="longitude" placeholder="Longitude" class="col-xs-12 col-sm-6"/>
                         </div>
                     </div>
                 </div>
@@ -47,6 +47,21 @@ $this->load->view('sistem/v_breadcrumb');
                     <div class="col-xs-12 col-sm-2">
                         <div class="clearfix">
                             <input value="<?= $edit['radius'] ?>" type="text" name="radius" id="radius" placeholder="Radius" class="col-xs-12 col-sm-6"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-xs-12 col-sm-5 no-padding-right">Presensi Umum :</label>
+                    <div class="col-xs-12 col-sm-7">
+                        <div class="clearfix">
+                            <label class="control-label">
+                                <input <?= ($edit['jenis_lokasi'] == '1') ? 'checked' : '' ; ?> name="jenis" value="1" type="radio" class="ace" />
+                                <span class="lbl"> AKTIF </span>
+                            </label>&nbsp;&nbsp;&nbsp;
+                            <label class="control-label">
+                                <input <?= ($edit['jenis_lokasi'] == '0') ? 'checked' : '' ; ?> name="jenis" value="0" type="radio" class="ace" />
+                                <span class="lbl"> TIDAK AKTIF </span>
+                            </label>
                         </div>
                     </div>
                 </div>
@@ -93,6 +108,7 @@ $this->load->view('sistem/v_breadcrumb');
             latitude: { required: true, minlength: 5 },
             longitude: { required: true, minlength: 5 },
             radius: { required: true, min: 10, max: 100},
+            jenis: { required: true},
             status: { required: true}
         });
     }

@@ -10,7 +10,7 @@ class M_presensi extends KZ_Model {
     {
         $options = [
             'alias'      => 'p',
-            'select'     => 'p.*, pg.nama, pg.nik',
+            'select'     => 'p.*, pg.nama, pg.nik, pg.jenis_pegawai',
             'join'       => [ ['m_pegawai pg','pg.id_pegawai = p.pegawai_id','left'] ],
             'columns'    => [null,'nama','tgl_presensi','waktu_masuk','status_presensi','waktu_pulang',null],
             'searchable' => ['nik','nama'],
@@ -21,14 +21,7 @@ class M_presensi extends KZ_Model {
         $no = $this->input->post('start');
         foreach ($result['data'] as $items) {
             $no++;
-            $btn_aksi = '<a href="'. site_url($param['module'].'/detail/'. encode($items['id_presensi'])) .'" 
-                    class="tooltip-info btn btn-white btn-info btn-sm btn-round" data-rel="tooltip" title="Lihat Data">
-                    <span class="blue"><i class="ace-icon fa fa-search-plus bigger-120"></i></span>
-                </a>';
-            $btn_aksi .= ($param['level'] != '1') ? '' : '<a href="'. site_url($param['module'].'/edit/'. encode($items['id_presensi'])) .'" 
-                    class="tooltip-warning btn btn-white btn-warning btn-sm btn-round" data-rel="tooltip" title="Ubah Data">
-                    <span class="orange"><i class="ace-icon fa fa-pencil-square-o bigger-120"></i></span>
-                </a><a href="#" itemid="'. encode($items['id_presensi']) .'" itemprop="'. ctk($items['nama']) .'" id="delete-btn" 
+            $btn_aksi = ($param['level'] != '1') ? '' : '<a href="#" itemid="'. encode($items['id_presensi']) .'" itemprop="'. ctk($items['nama']) .'" id="delete-btn" 
                     class="tooltip-error btn btn-white btn-danger btn-mini btn-round" data-rel="tooltip" title="Hapus Data">
                     <span class="red"><i class="ace-icon fa fa-trash-o"></i></span>
                 </a>';
@@ -49,9 +42,10 @@ class M_presensi extends KZ_Model {
             
             $row = [];
             $row[] = ctk($no);
-            $row[] = '<strong>'.ctk($items['nama']).'</strong><br><span class="grey">'.ctk($items['nik']).'</span>';
-            $row[] = format_date($items['tgl_presensi'])
-                .'<br> <small>Jam Kerja</small> : <strong class="blue">'.$jam_kerja.'</strong>';
+            $row[] = '<strong>'.ctk($items['nama']).'</strong><br><span class="grey">'
+                    .ctk($items['nik']).'</span>';
+            $row[] = '<strong>'.format_date($items['tgl_presensi'])
+                .'</strong><br> <small>Jam Kerja</small> : <strong class="blue">'.$jam_kerja.'</strong>';
             $row[] = '<strong class="green">'.$items['waktu_masuk'].'</strong><br>'.$btn_masuk;
             $row[] = st_mhs($items['status_presensi']).'<br><small>'.$items['catat_presensi'].'</small>';
             $row[] = '<strong class="orange">'.$items['waktu_pulang'].'</strong><br>'.$btn_pulang;

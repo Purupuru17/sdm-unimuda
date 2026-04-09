@@ -14,6 +14,7 @@ class M_lokasi extends KZ_Model {
             'latitude' => null,
             'longitude' => null,
             'radius' => null,
+            'jenis_lokasi' => null,
             'status_lokasi' => null
         ];
     }

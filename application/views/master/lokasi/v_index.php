@@ -39,6 +39,7 @@ $this->load->view('sistem/v_breadcrumb');
                                     <th>Nama</th>
                                     <th>Lokasi</th>
                                     <th>Radius</th>
+                                    <th>Presensi Umum</th>
                                     <th>Status</th>
                                     <th>Aksi</th>
                                 </tr>
@@ -100,10 +101,10 @@ load_js(array(
     function tableManager() {
         indexTable = new DataTableManager("#index-table", {
             aoColumnDefs: [
-                {bSortable: false, aTargets: [0,5]},
-                {bSearchable: false, aTargets: [0,5]},
-                {sClass: "center", aTargets: [0, 1, 2, 3, 4]},
-                {sClass: "center nowrap", aTargets: [5]}
+                {bSortable: false, aTargets: [0,6]},
+                {bSearchable: false, aTargets: [0,6]},
+                {sClass: "center", aTargets: [0, 1, 2, 3, 4, 5]},
+                {sClass: "center nowrap", aTargets: [6]}
             ]
         }).init();
     }

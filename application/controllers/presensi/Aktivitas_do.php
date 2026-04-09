@@ -36,7 +36,7 @@ class Aktivitas_do extends KZ_Controller {
         if(empty($userLat) || empty($userLng)){
             jsonResponse(['status' => false, 'msg' => 'GPS tidak ditemukan. Silahkan coba ulang.']);
         }
-        $lokasi = $this->m_lokasi->all(['status_lokasi' => '1']);
+        $lokasi = $this->m_lokasi->all(['jenis_lokasi' => '1', 'status_lokasi' => '1']);
         
         $result = $this->_detectGedung($userLat, $userLng, $lokasi['data']);
         if(!empty($result)) {
@@ -51,10 +51,7 @@ class Aktivitas_do extends KZ_Controller {
         if(!$this->fungsi->Validation($this->rules, 'ajax')){
             jsonResponse(['status' => false, 'msg' => validation_errors()]);
         }
-        if(empty($this->pid)){
-            jsonResponse(['status' => false, 'msg' => 'Pegawai tidak ditemukan']);
-        }
-        $this->load->model(['m_kerja', 'm_libur']);
+        $this->load->model(['m_pegawai','m_kerja','m_libur']);
         
         $status = $this->input->post('status');
         $lokasi = $this->input->post('lokasi');
@@ -62,19 +59,24 @@ class Aktivitas_do extends KZ_Controller {
         $longitude = $this->input->post('longitude');
         $foto = $this->input->post('foto');
         
-        //CEK LIBUR
+        // CEK AKUN
+        $pegawai = $this->m_pegawai->get($this->pid);
+        if(empty($pegawai)){
+            jsonResponse(['status' => false, 'msg' => 'Pegawai tidak ditemukan']);
+        }
+        // CEK LIBUR
         $libur = $this->m_libur->get(['tgl_libur' => date('Y-m-d')]);
         if(!empty($libur)){
             jsonResponse(['status' => false, 'msg' => 'Hari Libur, '.$libur['catat_libur']]);
         }
-        //CEK KERJA
+        // CEK KERJA
         $kerja = $this->m_kerja->get(['hari_kerja' => date('N')]);
         if(empty($kerja)){
             jsonResponse(['status' => false, 'msg' => 'Diluar Hari Kerja']);
         }
         $masuk = $kerja['masuk_kerja'];
         $pulang = $kerja['pulang_kerja'];
-        $limit = $kerja['limit_kerja'];
+        $limit = (int) $kerja['limit_kerja'];
         
         $now = new DateTime();
         $today = date('Y-m-d');
@@ -86,20 +88,20 @@ class Aktivitas_do extends KZ_Controller {
         
         switch ($status) {
             case '1':
-                //CEK AWAL
+                // CEK AWAL
                 if ($now < $jamMasuk) {
                     jsonResponse(['status' => false, 'msg' => 'Belum waktunya presensi masuk. Jam Masuk : '.format_date($masuk,4)]);
                 }
-                //CEK OVER
+                // CEK OVER
                 if ($now > $jamPulang) {
                     jsonResponse(['status' => false, 'msg' => 'Presensi masuk sudah berakhir, telah melewati Waktu Kerja']);
                 }
-                //CEK TGL
+                // CEK TGL
                 $cekTgl = $this->m_presensi->get(['pegawai_id' => $this->pid, 'tgl_presensi' => $today]);
                 if(!empty($cekTgl)){
                     jsonResponse(['status' => false, 'msg' => 'Sudah presensi masuk sebelumnya']);
                 }
-                //STATUS LIMIT
+                // STATUS LIMIT
                 $is_status ='TEPAT WAKTU';
                 $is_note = '';
                 if ($now > $jamLimit) {

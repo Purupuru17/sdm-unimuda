@@ -1,63 +1,56 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Aktivitas extends KZ_Controller {
+class Kegiatan extends KZ_Controller {
 
-    private $module = 'presensi/aktivitas';
-    private $module_do = 'presensi/aktivitas_do'; 
+    private $module = 'presensi/kegiatan';
+    private $module_do = 'presensi/kegiatan_do'; 
     private $url_route = array('id', 'source', 'type');
     
     function __construct() {
         parent::__construct();
-        $this->load->model(array('m_presensi'));
+        $this->load->model(['m_kegiatan']);
         $this->_pegawaiId();
     }
     function index() {
         $this->data['module'] = $this->module;
-        $this->data['title'] = array('Aktivitas','List Data');
+        $this->data['title'] = array('Kegiatan','List Data');
         $this->data['breadcrumb'] = array( 
             array('title' => $this->uri->segment(1), 'url'=>'#'),
             array('title' => $this->uri->segment(2), 'url'=> '')
         );
-        $this->load_view('presensi/aktivitas/v_index', $this->data);
+        $this->load_view('presensi/kegiatan/v_index', $this->data);
     }
     function add() {
+        $this->load->model(['m_agenda']);
+        
         if(empty($this->pid) && $this->sessionlevel != '1'){
             $this->session->set_flashdata('notif', notif('warning', 'Peringatan', 'Pegawai tidak ditemukan'));
             redirect($this->module);
         }
-        //CEK LIBUR
-        $this->load->model(['m_libur']);
-        $libur = $this->m_libur->get(['tgl_libur' => date('Y-m-d')]);
-        if(!empty($libur)){
-            $this->session->set_flashdata('notif', notif('warning', 'Peringatan', 'Hari Libur, '.$libur['catat_libur']));
-            redirect($this->module);
-        }
+        $this->data['agenda'] = $this->m_agenda->all(['status_agenda' => '1', 'is_open' => '1']);
+        
         $this->data['module'] = $this->module;
         $this->data['action'] = $this->module_do.'/add';
-        $this->data['title'] = array('Aktivitas','Tambah Data');
+        $this->data['title'] = array('Kegiatan','Tambah Data');
         $this->data['breadcrumb'] = array( 
             array('title' => $this->uri->segment(1), 'url'=>'#'),
             array('title' => $this->uri->segment(2), 'url'=> site_url($this->module)),
             array('title' => $this->data['title'][1], 'url'=>'')
         );
-        $this->load_view('presensi/aktivitas/v_add', $this->data);
+        $this->load_view('presensi/kegiatan/v_add', $this->data);
     }
     function delete() {
         $id = decode($this->input->post('id'));
         if(empty($id)){
             redirect($this->module);
         }
-        $get = $this->m_presensi->get($id);
+        $get = $this->m_kegiatan->get($id);
         if(empty($get)){
             $this->session->set_flashdata('notif', notif('warning', 'Peringatan', 'Data tidak ditemukan'));
             redirect($this->module);
         }
-        $result = $this->m_presensi->delete($id);
+        $result = $this->m_kegiatan->delete($id);
         if ($result) {
-            // DELETE FOTO
-            (is_file($get['foto_masuk'])) ? unlink($get['foto_masuk']) : false;
-            (is_file($get['foto_pulang'])) ? unlink($get['foto_pulang']) : false;
-            
             $this->session->set_flashdata('notif', notif('success', 'Informasi', 'Data berhasil dihapus'));
             redirect($this->module);
         } else {
@@ -101,16 +94,16 @@ class Aktivitas extends KZ_Controller {
             $where['jenis_pegawai'] = $jenis;
         }
         if ($status != '') {
-            $where['status_presensi'] = $status;
+            $where['status'] = $status;
         }
         if ($awal != '') {
-            $where['DATE(tgl_presensi) >='] = $awal;
+            $where['DATE(waktu) >='] = $awal;
         }
         if ($akhir != '') {
-            $where['DATE(tgl_presensi) <='] = $akhir;
+            $where['DATE(waktu) <='] = $akhir;
         }
         
-        $datatables = $this->m_presensi->getDatatables($where, ['module' => $this->module, 'level' => $this->sessionlevel]);
+        $datatables = $this->m_kegiatan->getDatatables($where, ['module' => $this->module, 'level' => $this->sessionlevel]);
         jsonResponse($datatables);
     }
     function _listPegawai(){
