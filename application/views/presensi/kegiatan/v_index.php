@@ -173,7 +173,6 @@ $this->load->view('sistem/v_breadcrumb');
     function loadIndex() {
         const indexTable = new DataTableManager("#index-table", {
             bServerSide: true,
-            iDisplayLength: 30,
             ajax: {
                 url: module + "/ajax/type/table/source/index",
                 type: "POST",

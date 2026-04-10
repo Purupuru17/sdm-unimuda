@@ -120,7 +120,7 @@ class Kegiatan extends KZ_Controller {
             $where['id_pegawai'] = decode($id);
             $result = $this->m_pegawai->all($where);
         }else{
-            $result = $this->m_pegawai->all($where, ['like' => ['nama'], 'key' => $key]);
+            $result = $this->m_pegawai->all($where, ['order' => 'nama ASC', 'like' => ['nama'], 'key' => $key]);
         }
         $data = array();
         foreach ($result['data'] as $val) {

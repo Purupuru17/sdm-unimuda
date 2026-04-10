@@ -15,7 +15,7 @@ class M_kegiatan extends KZ_Model {
                     ['m_pegawai pg','pg.id_pegawai = p.pegawai_id','left'],
                     ['aik_agenda a','a.id_agenda = p.agenda_id','left'],
                 ],
-            'columns'    => [null,'nama','tgl_presensi','waktu_masuk','status_presensi','waktu_pulang',null],
+            'columns'    => [null,'nama','waktu','lokasi','status',null],
             'searchable' => ['nik','nama'],
             'order'      => ['waktu' => 'desc']
         ];

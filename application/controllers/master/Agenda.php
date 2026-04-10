@@ -61,7 +61,8 @@ class Agenda extends KZ_Controller {
             redirect($this->module);
         }
         // PRESENSI
-        $getpre = $this->m_agenda->getPresensi(['agenda_id' => $id]);
+        $this->load->model(['m_kegiatan']);
+        $getpre = $this->m_kegiatan->get(['agenda_id' => $id]);
         if(!empty($getpre)){
             $this->session->set_flashdata('notif', notif('warning', 'Peringatan', 'Data tidak dapat dihapus. Terhubung data presensi'));
             redirect($this->module);
