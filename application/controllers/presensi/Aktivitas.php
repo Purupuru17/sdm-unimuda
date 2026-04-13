@@ -120,7 +120,7 @@ class Aktivitas extends KZ_Controller {
         $key = $this->input->post('key');
         $id = $this->input->get('id');
         
-        if(!empty($this->pid)){
+        if(!empty($this->pid) && ($this->sessionlevel != '1')){
             $where['id_pegawai'] = $this->pid;
         }
         if(!empty($id)){

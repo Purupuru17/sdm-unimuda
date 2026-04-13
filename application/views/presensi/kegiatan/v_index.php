@@ -68,11 +68,11 @@ $this->load->view('sistem/v_breadcrumb');
                     <div class="col-xs-12 col-sm-2">
                         <div class="clearfix">
                             <div class="input-daterange input-group">
-                                <input type="text" class="form-control" name="awal" id="awal" placeholder="Awal" />
+                                <input value="<?= date('Y-m-d') ?>" type="text" class="form-control" name="awal" id="awal" placeholder="Awal" />
                                 <span class="input-group-addon">
                                     <i class="fa fa-exchange"></i>
                                 </span>
-                                <input type="text" class="form-control" name="akhir" id="akhir" placeholder="Akhir"/>
+                                <input value="<?= date('Y-m-d') ?>" type="text" class="form-control" name="akhir" id="akhir" placeholder="Akhir"/>
                             </div>
                         </div>
                     </div>

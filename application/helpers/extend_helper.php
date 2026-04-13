@@ -201,7 +201,9 @@ if (!function_exists('load_array')) {
                 $val = ['PNS','SWASTA','YAYASAN','KONTRAK'];
                 break;
             case 'pangkat':
-                $val = ['II/A','II/B','II/C','II/D'];
+                $val = ['II/A','II/B','II/C','II/D',
+                    'III/A','III/B','III/C','III/D', 'IV/A','IV/B','IV/C','IV/D', 'IVE'
+                    ];
                 break;
             case 'fungsional':
                 $val = ['TENAGA PENGAJAR','ASISTEN AHLI','LEKTOR','LEKTOR KEPALA','GURU BESAR'];

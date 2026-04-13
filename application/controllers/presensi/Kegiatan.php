@@ -27,7 +27,9 @@ class Kegiatan extends KZ_Controller {
             $this->session->set_flashdata('notif', notif('warning', 'Peringatan', 'Pegawai tidak ditemukan'));
             redirect($this->module);
         }
-        $this->data['agenda'] = $this->m_agenda->all(['status_agenda' => '1', 'is_open' => '1']);
+        $this->data['agenda'] = $this->m_agenda->all([
+            'status_agenda' => '1', 'is_open' => '1', 'DATE(waktu_agenda)' => date('Y-m-d')
+        ]);
         
         $this->data['module'] = $this->module;
         $this->data['action'] = $this->module_do.'/add';
@@ -113,7 +115,7 @@ class Kegiatan extends KZ_Controller {
         $key = $this->input->post('key');
         $id = $this->input->get('id');
         
-        if(!empty($this->pid)){
+        if(!empty($this->pid) && ($this->sessionlevel != '1')){
             $where['id_pegawai'] = $this->pid;
         }
         if(!empty($id)){

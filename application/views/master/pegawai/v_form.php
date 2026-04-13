@@ -83,7 +83,7 @@ $this->load->view('sistem/v_breadcrumb');
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="control-label col-xs-12 col-sm-4 no-padding-right">Unit Kerja :</label>
+                    <label class="control-label col-xs-12 col-sm-4 no-padding-right">Homebase :</label>
                     <div class="col-xs-12 col-sm-4">
                         <div class="clearfix">
                             <input value="<?= encode($edit['unit_id']) ?>" type="hidden" name="unit" id="unit" class="width-100"/>

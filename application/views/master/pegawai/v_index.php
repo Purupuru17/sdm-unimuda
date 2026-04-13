@@ -53,7 +53,7 @@ $this->load->view('sistem/v_breadcrumb');
                                 <tr>
                                     <th>#</th>
                                     <th>Nama</th>
-                                    <th></th>
+                                    <th>Homebase</th>
                                     <th></th>
                                     <th></th>
                                     <th>Aksi</th>

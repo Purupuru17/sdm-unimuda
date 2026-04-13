@@ -29,7 +29,12 @@ class M_pegawai extends KZ_Model {
     function getDatatables($where = [], $param = []) 
     {
         $options = [
-            'columns'    => [null,'nama','nama','nama','nama',null],
+            'alias'      => 'p',
+            'select'     => 'p.*, u.nama_unit',
+            'join'       => [ 
+                ['m_unit u','u.id_unit = p.unit_id','left']
+            ],
+            'columns'    => [null,'nama','jenis_pegawai','nama','nama',null],
             'searchable' => ['nik','nama'],
             'order'      => ['nama' => 'ASC']
         ];
@@ -56,7 +61,7 @@ class M_pegawai extends KZ_Model {
             $row = [];
             $row[] = ctk($no);
             $row[] = '<strong>'.ctk($items['nama']).'</strong><br><span class="blue">'.ctk($items['nik']).'</span>';
-            $row[] = '';
+            $row[] = ctk($items['jenis_pegawai']).'<br><small>'.ctk($items['nama_unit']).'</span>';
             $row[] = '';
             $row[] = '';
             $row[] = '<div class="action-buttons">'.$btn_aksi.'</div>';
