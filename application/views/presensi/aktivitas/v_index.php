@@ -154,15 +154,15 @@ $this->load->view('sistem/v_breadcrumb');
         e.preventDefault();
         const id = $(this).attr("itemid");
         const title = "<h4 class='blue center'><i class='ace-icon fa fa-image'></i> Foto Masuk </h4>";
-        const msg = `<p class="center"><img src="${id}" class="img-thumbnail" width="100%"/> </p>`;
-        bootbox.dialog({ title: title, message: msg, closeButton: true });
+        const msg = `<p class="center"><img src="${id}" class="img-thumbnail" width="70%"/> </p>`;
+        bootbox.dialog({ title: title, message: msg, backdrop: true, onEscape: true });
     });
     $(document.body).on("click", "#imgPulang-btn", function(e) {
         e.preventDefault();
         const id = $(this).attr("itemid");
         const title = "<h4 class='orange center'><i class='ace-icon fa fa-image'></i> Foto Pulang </h4>";
-        const msg = `<p class="center"><img src="${id}" class="img-thumbnail" width="100%"/> </p>`;
-        bootbox.dialog({ title: title, message: msg, closeButton: true });
+        const msg = `<p class="center"><img src="${id}" class="img-thumbnail" width="70%"/> </p>`;
+        bootbox.dialog({ title: title, message: msg, backdrop: true, onEscape: true });
     });
     $(document.body).on("click", "#delete-btn", function(e) {
         e.preventDefault();
