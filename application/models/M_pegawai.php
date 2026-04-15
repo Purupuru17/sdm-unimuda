@@ -30,11 +30,13 @@ class M_pegawai extends KZ_Model {
     {
         $options = [
             'alias'      => 'p',
-            'select'     => 'p.*, u.nama_unit',
+            'select'     => 'p.*, u.nama_unit, j.nama_jabatan, uu.nama_unit AS unit_jabatan',
             'join'       => [ 
-                ['m_unit u','u.id_unit = p.unit_id','left']
+                ['m_unit u','u.id_unit = p.unit_id','left'],
+                ['m_jabatan j','j.id_jabatan = p.jabatan_id','left'],
+                ['m_unit uu','uu.id_unit = j.unit_id','left'],
             ],
-            'columns'    => [null,'nama','jenis_pegawai','nama','nama',null],
+            'columns'    => [null,'nama','jenis_pegawai','nama_jabatan','tgl_pegawai','akademik',null],
             'searchable' => ['nik','nama'],
             'order'      => ['nama' => 'ASC']
         ];
@@ -57,13 +59,19 @@ class M_pegawai extends KZ_Model {
                     class="tooltip-success btn btn-white btn-success btn-mini btn-round" data-rel="tooltip" title="Buat Akun">
                     <span class="green"><i class="ace-icon fa fa-user-plus"></i></span>
                 </a>' : '';
+            
+            $tanggal_masuk = new DateTime($items['tgl_pegawai']);
+            $hari_ini = new DateTime();
+            $selisih = $tanggal_masuk->diff($hari_ini);
+            $masa_kerja = empty($items['tgl_pegawai']) ? '' : $selisih->y . ' Tahun ' . $selisih->m . ' Bulan ';
                        
             $row = [];
             $row[] = ctk($no);
             $row[] = '<strong>'.ctk($items['nama']).'</strong><br><span class="blue">'.ctk($items['nik']).'</span>';
-            $row[] = ctk($items['jenis_pegawai']).'<br><small>'.ctk($items['nama_unit']).'</span>';
-            $row[] = '';
-            $row[] = '';
+            $row[] = ctk($items['jenis_pegawai']).'<br><span>'.ctk($items['nama_unit']).'</span>';
+            $row[] = $items['nama_jabatan'].'<br><small>'.$items['unit_jabatan'].'</small>';
+            $row[] = $items['nuptk'].'<br>'.$items['nidn'];
+            $row[] = $items['akademik'].' - '.$items['pangkat'].'<br>'.$masa_kerja;
             $row[] = '<div class="action-buttons">'.$btn_aksi.'</div>';
 
             $data[] = $row;

@@ -34,8 +34,8 @@ class Pegawai_do extends KZ_Controller {
         $data['nama'] = $user['fullname'];
         $data['nama_gelar'] = $this->input->post('gelar');
         
-        $data['tgl_pegawai'] = $this->input->post('tanggal');
         $data['jenis_pegawai'] = $this->input->post('jenis');
+        $data['tgl_pegawai'] = empty($this->input->post('tanggal')) ? null : $this->input->post('tanggal');
         $data['unit_id'] = decode($this->input->post('unit'));
         
         $data['nidn'] = $this->input->post('nidn');
@@ -72,8 +72,8 @@ class Pegawai_do extends KZ_Controller {
         $data['nama'] = strtoupper($this->input->post('nama'));
         $data['nama_gelar'] = $this->input->post('gelar');
         
-        $data['tgl_pegawai'] = $this->input->post('tanggal');
         $data['jenis_pegawai'] = $this->input->post('jenis');
+        $data['tgl_pegawai'] = empty($this->input->post('tanggal')) ? null : $this->input->post('tanggal');
         $data['unit_id'] = decode($this->input->post('unit'));
         
         $data['nidn'] = $this->input->post('nidn');
@@ -146,7 +146,7 @@ class Pegawai_do extends KZ_Controller {
         ), array(
             'field' => 'tanggal',
             'label' => 'Tanggal Masuk',
-            'rules' => 'required|trim|xss_clean|min_length[5]'
+            'rules' => 'trim|xss_clean|min_length[5]'
         ), array(
             'field' => 'jenis',
             'label' => 'Jenis Pegawai',
@@ -154,7 +154,7 @@ class Pegawai_do extends KZ_Controller {
         ), array(
             'field' => 'unit',
             'label' => 'Unit Kerja',
-            'rules' => 'required|trim|xss_clean'
+            'rules' => 'trim|xss_clean'
         ), array(
             'field' => 'nidn',
             'label' => 'NIDN',

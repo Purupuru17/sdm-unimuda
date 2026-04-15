@@ -1,82 +1,72 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Pegawai extends KZ_Controller {
+class Jabatan extends KZ_Controller {
     
-    private $module = 'master/pegawai';
-    private $module_do = 'master/pegawai_do';    
+    private $module = 'master/jabatan';
+    private $module_do = 'master/jabatan_do';
     private $url_route = array('id', 'source', 'type');
     
     function __construct() {
         parent::__construct();
-        $this->load->model(['m_pegawai']);
+        $this->load->model(array('m_jabatan'));
     }
     function index() {
         $this->data['module'] = $this->module;
-        $this->data['title'] = array('Pegawai','List Data');
+        $this->data['title'] = array('Jabatan','List Data');
         $this->data['breadcrumb'] = array( 
             array('title' => $this->uri->segment(1), 'url'=>'#'),
             array('title' => $this->uri->segment(2), 'url'=> '')
         );
-        $this->load_view('master/pegawai/v_index', $this->data);
+        $this->load_view('master/jabatan/v_index', $this->data);
     }
-    function add($id = NULL) {
-        if(!empty(decode($id))){
-            $this->session->set_userdata(array('pid' => decode($id)));
-            $this->session->set_flashdata('notif', notif('success', 'Informasi', 'Terhubung akun : '. decode($id)));
-            redirect($this->module);
-        }
-        $this->data['edit'] = $this->m_pegawai->getEmpty();
+    function add() {
+        $this->data['edit'] = $this->m_jabatan->getEmpty();
         
         $this->data['module'] = $this->module;
         $this->data['action'] = $this->module_do.'/add';
-        $this->data['title'] = array('Pegawai','Tambah Data');
+        $this->data['title'] = array('Jabatan','Tambah Data');
         $this->data['breadcrumb'] = array( 
             array('title' => $this->uri->segment(1), 'url'=>'#'),
             array('title' => $this->uri->segment(2), 'url'=> site_url($this->module)),
             array('title' => $this->data['title'][1], 'url'=>'')
         );
-        $this->load_view('master/pegawai/v_form', $this->data);
+        $this->load_view('master/jabatan/v_form', $this->data);
     }
     function edit($id = NULL) {
         if(empty(decode($id))){
             redirect($this->module);
         }
-        $this->data['edit'] = $this->m_pegawai->get(decode($id));
+        $this->data['edit'] = $this->m_jabatan->get(decode($id));
         
         $this->data['module'] = $this->module;
         $this->data['action'] = $this->module_do.'/edit/'.$id;
-        $this->data['title'] = array('Pegawai','Ubah Data');
+        $this->data['title'] = array('Jabatan','Ubah Data');
         $this->data['breadcrumb'] = array( 
             array('title' => $this->uri->segment(1), 'url'=>'#'),
             array('title' => $this->uri->segment(2), 'url'=> site_url($this->module)),
             array('title' => $this->data['title'][1], 'url'=>'')
         );
-        $this->load_view('master/pegawai/v_form', $this->data);
+        $this->load_view('master/jabatan/v_form', $this->data);
     }
     function delete() {
         $id = decode($this->input->post('id'));
         if(empty($id)){
             redirect($this->module);
         }
-        $this->load->model(['m_presensi']);
+        $this->load->model(['m_pegawai']);
         
-        $get = $this->m_pegawai->get($id);
+        $get = $this->m_jabatan->get($id);
         if(empty($get)){
             $this->session->set_flashdata('notif', notif('warning', 'Peringatan', 'Data tidak ditemukan'));
             redirect($this->module);
         }
-        // AKUN
-        if(!empty($get['user_id'])){
-            $this->session->set_flashdata('notif', notif('warning', 'Peringatan', 'Data tidak dapat dihapus. Terhubung data akun'));
-            redirect($this->module);
-        }
-        // PRESENSI
-        $getpre = $this->m_presensi->get(['pegawai_id' => $id]);
+        // PEGAWAI
+        $getpre = $this->m_pegawai->get(['jabatan_id' => $id]);
         if(!empty($getpre)){
-            $this->session->set_flashdata('notif', notif('warning', 'Peringatan', 'Data tidak dapat dihapus. Terhubung data presensi'));
+            $this->session->set_flashdata('notif', notif('warning', 'Peringatan', 'Data tidak dapat dihapus. Terhubung data pegawai'));
             redirect($this->module);
         }
-        $result = $this->m_pegawai->delete($id);
+        $result = $this->m_jabatan->delete($id);
         if ($result) {
             $this->session->set_flashdata('notif', notif('success', 'Informasi', 'Data berhasil dihapus'));
             redirect($this->module);
@@ -104,25 +94,45 @@ class Pegawai extends KZ_Controller {
             }
         }
     }
-    function _tableIndex() 
-    {
-        $jenis = $this->input->post('jenis');
-        $unit = decode($this->input->post('unit'));
-        $akademik = $this->input->post('akademik');
-        
+    function _tableIndex() {
+        $options = [
+            'alias'      => 'j',
+            'select'     => 'j.*, u.nama_unit, jj.nama_jabatan AS nama_atasan, uu.nama_unit AS unit_atasan',
+            'join'       => [ 
+                ['m_unit u','u.id_unit = j.unit_id','inner'],
+                ['m_jabatan jj','jj.id_jabatan = j.atasan','left'],
+                ['m_unit uu','uu.id_unit = jj.unit_id','left'],
+            ],
+            'order'      => 'nama_jabatan ASC'
+        ];
         $where = [];
-        if ($jenis != '') {
-            $where['jenis_pegawai'] = $jenis;
-        }
-        if ($unit != '') {
-            $where['p.unit_id'] = $unit;
-        }
-        if ($akademik != '') {
-            $where['akademik'] = $akademik;
-        }
         
-        $datatables = $this->m_pegawai->getDatatables($where, ['module' => $this->module]);
-        jsonResponse($datatables);
+        $result = $this->m_jabatan->all($where, $options); 
+        if($result['rows'] < 1){
+            jsonResponse(array('status' => false, 'msg' => 'Data tidak ditemukan'));
+        }
+        $data = array('table' => []);
+        $no = 1;
+        foreach ($result['data'] as $items) {
+            $btn_aksi = '<a href="'. site_url($this->module.'/edit/'. encode($items['id_jabatan'])) .'" 
+                    class="tooltip-warning btn btn-white btn-warning btn-sm btn-round" data-rel="tooltip" title="Ubah Data">
+                    <span class="orange"><i class="ace-icon fa fa-pencil-square-o bigger-120"></i></span>
+                </a><a href="#" itemid="'. encode($items['id_jabatan']) .'" itemprop="'. ctk($items['nama_jabatan']) .'" id="delete-btn" 
+                    class="tooltip-error btn btn-white btn-danger btn-mini btn-round" data-rel="tooltip" title="Hapus Data">
+                    <span class="red"><i class="ace-icon fa fa-trash-o"></i></span>
+                </a>';
+            
+            $row = [];  
+            $row[] = ctk($no);
+            $row[] = '<strong>'.ctk($items['nama_jabatan']).'</strong>';
+            $row[] = $items['nama_unit'];
+            $row[] = $items['nama_atasan'].'<br><small>'.$items['unit_atasan'].'</small>';
+            $row[] = '<div class="action-buttons">'.$btn_aksi.'</div>';
+
+            $data['table'][] = $row;
+            $no++;
+        }
+        jsonResponse(array('data' => $data, 'status' => true, 'msg' => 'Data ditemukan'));
     }
     function _listUnit()
     {
@@ -148,6 +158,7 @@ class Pegawai extends KZ_Controller {
         $this->load->model(['m_jabatan']);
         
         $key = $this->input->post('key');
+        $other_id = decode($this->input->post('id'));
         $id = decode($this->input->get('id'));
         
         $options = [
@@ -158,10 +169,14 @@ class Pegawai extends KZ_Controller {
             'key'       => $key,
             'order'     => 'nama_unit ASC'
         ];
+        $where = [];
+        if(!empty($other_id)){
+            $where['id_jabatan <>'] = $other_id;
+        }
         if(!empty($id)){
             $result = $this->m_jabatan->all(['id_jabatan' => $id], $options);
         }else{
-            $result = $this->m_jabatan->all(null, $options);
+            $result = $this->m_jabatan->all($where, $options);
         }
         $data = array();
         foreach ($result['data'] as $val) {

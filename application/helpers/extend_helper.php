@@ -202,7 +202,7 @@ if (!function_exists('load_array')) {
                 break;
             case 'pangkat':
                 $val = ['II/A','II/B','II/C','II/D',
-                    'III/A','III/B','III/C','III/D', 'IV/A','IV/B','IV/C','IV/D', 'IVE'
+                    'III/A','III/B','III/C','III/D', 'IV/A','IV/B','IV/C','IV/D', 'IV/E'
                     ];
                 break;
             case 'fungsional':

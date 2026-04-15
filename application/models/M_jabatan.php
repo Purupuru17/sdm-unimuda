@@ -11,8 +11,8 @@ class M_jabatan extends KZ_Model {
         return [
             $this->id => null,
             'unit_id' => null,
-            'atasan_jabatan' => null,
-            'nama_jabatan' => null
+            'nama_jabatan' => null,
+            'atasan' => null
         ];
     }
 }

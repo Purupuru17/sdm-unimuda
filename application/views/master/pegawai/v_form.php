@@ -55,17 +55,9 @@ $this->load->view('sistem/v_breadcrumb');
                     </div>
                 </div>
                 <div class="social-or-login center">
-                    <span class="red">Data SDM (*)</span>
+                    <span class="blue">Data SDM</span>
                 </div>
                 <div class="space-6"></div>
-                <div class="form-group">
-                    <label class="control-label col-xs-12 col-sm-4 no-padding-right">Tanggal Masuk (SK Pegawai) :</label>
-                    <div class="col-xs-12 col-sm-3">
-                        <div class="clearfix">
-                            <input value="<?= $edit['tgl_pegawai'] ?>" type="text" name="tanggal" id="tanggal" placeholder="Tanggal SK Pegawai" class="date-picker col-xs-12 col-sm-6"/>
-                        </div>
-                    </div>
-                </div>
                 <div class="form-group">
                     <label class="control-label col-xs-12 col-sm-4 no-padding-right">Jenis Pegawai :</label>
                     <div class="col-xs-12 col-sm-2">
@@ -83,10 +75,26 @@ $this->load->view('sistem/v_breadcrumb');
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="control-label col-xs-12 col-sm-4 no-padding-right">Homebase :</label>
+                    <label class="control-label col-xs-12 col-sm-4 no-padding-right">Tanggal Masuk (SK Pegawai) :</label>
+                    <div class="col-xs-12 col-sm-3">
+                        <div class="clearfix">
+                            <input value="<?= $edit['tgl_pegawai'] ?>" type="text" name="tanggal" id="tanggal" placeholder="Tanggal SK Pegawai" class="date-picker col-xs-12 col-sm-6"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-xs-12 col-sm-4 no-padding-right">Unit Kerja (Homebase) :</label>
                     <div class="col-xs-12 col-sm-4">
                         <div class="clearfix">
                             <input value="<?= encode($edit['unit_id']) ?>" type="hidden" name="unit" id="unit" class="width-100"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-xs-12 col-sm-4 no-padding-right">Jabatan Struktural :</label>
+                    <div class="col-xs-12 col-sm-4">
+                        <div class="clearfix">
+                            <input value="<?= encode($edit['jabatan_id']) ?>" type="hidden" name="jabatan" id="jabatan" class="width-100"/>
                         </div>
                     </div>
                 </div>
@@ -158,14 +166,6 @@ $this->load->view('sistem/v_breadcrumb');
                         </div>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label class="control-label col-xs-12 col-sm-4 no-padding-right">Jabatan Struktural :</label>
-                    <div class="col-xs-12 col-sm-4">
-                        <div class="clearfix">
-                            <input value="<?= encode($edit['jabatan_id']) ?>" type="hidden" name="jabatan" id="jabatan" class="width-100"/>
-                        </div>
-                    </div>
-                </div>
                 <div class="clearfix form-actions">
                     <div class="col-md-offset-4 col-md-5">
                         <button class="btn" type="reset">
@@ -207,7 +207,7 @@ $this->load->view('sistem/v_breadcrumb');
     function getSelect() {
         $("#unit").select2({
             placeholder: "-----> Pilih Opsi <-----",
-            //minimumInputLength: 3,
+            allowClear: true,
             ajax: {
                 url: module + "/ajax/type/list/source/unit",
                 type: "POST",
@@ -227,14 +227,13 @@ $this->load->view('sistem/v_breadcrumb');
                     jsfRequest(module + "/ajax/type/list/source/unit?id=" + id, "GET")
                         .done(function(result) {
                             callback(result[0]);
-                            console.log(result[0]);
                     });
                 }
             }
         });
         $("#jabatan").select2({
             placeholder: "-----> Pilih Opsi <-----",
-            //minimumInputLength: 3,
+            allowClear: true,
             ajax: {
                 url: module + "/ajax/type/list/source/jabatan",
                 type: "POST",
@@ -264,9 +263,9 @@ $this->load->view('sistem/v_breadcrumb');
             nik: { required: true, digits: true, minlength: 16, maxlength: 16 },
             nama: { required: true, minlength: 3 },
             gelar: { required: true, minlength: 5 },
-            tanggal: { required: true, date: true, minlength: 5 },
+            tanggal: { date: true, minlength: 5 },
             jenis: { required: true },
-            unit: { required: true },
+            unit: { },
             nidn: { digits: true, minlength: 5},
             nuptk: { digits: true, minlength: 5},
             status: {  },
