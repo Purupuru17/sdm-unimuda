@@ -98,6 +98,11 @@ $this->load->view('sistem/v_breadcrumb');
                         <i class="ace-icon fa fa-list"></i>
                         <?= $title[1] ?>
                     </h5>
+                    <div class="widget-toolbar">
+                        <a href="#" data-action="collapse" class="orange2">
+                            <i class="ace-icon fa fa-chevron-up bigger-125"></i>
+                        </a>
+                    </div>
                     <div class="widget-toolbar no-border">
                         <div class="btn-group btn-overlap">
                             <a href="<?= site_url($module.'/add') ?>" class="btn btn-white btn-primary btn-bold">
@@ -127,7 +132,45 @@ $this->load->view('sistem/v_breadcrumb');
                     </div>
                 </div>
             </div>
-        </div><!-- /.col -->
+        </div>
+        <div class="col-xs-12">
+            <div class="space-10"></div>
+            <div class="widget-box widget-color-green2">
+                <div class="widget-header">
+                    <h5 class="widget-title bigger lighter">
+                        <i class="ace-icon fa fa-list"></i>
+                        Rekap Presensi
+                    </h5>
+                    <div class="widget-toolbar">
+                        <a href="#" data-action="collapse" class="orange2">
+                            <i class="ace-icon fa fa-chevron-up bigger-125"></i>
+                        </a>
+                    </div>
+                    <div class="widget-toolbar no-border">
+                        <div class="btn-group btn-overlap">
+                            <button onclick="loadRekap()" class="btn btn-white btn-primary btn-bold">
+                                <i class="fa fa-search-plus bigger-110"></i> Lihat Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="widget-body">
+                    <p id="one-spin" style="display: none; margin-top: 10px;" class="bigger-130 blue" align="center">
+                        <i class="fa fa-spinner fa-spin fa-fw fa-2x"></i> Loading . . .
+                    </p>
+                    <div class="widget-main padding-2 table-responsive">
+                        <table id="rekap-table" class="table table-striped table-bordered table-hover">
+                            <thead>
+                            </thead>
+                            <tbody>
+                            
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /.col -->
     </div><!-- /.row -->
 </div><!-- /.page-content -->
 
@@ -141,7 +184,7 @@ $this->load->view('sistem/v_breadcrumb');
 ?>
 <script type="text/javascript">
     const module = "<?= site_url($module) ?>";
-    let indexTable;
+    let indexTable, rekapTable;
     $(document).ready(function () {
         $(".select2").select2({allowClear: true});
         $(".input-daterange, #post_tgl").datepicker({
@@ -185,8 +228,11 @@ $this->load->view('sistem/v_breadcrumb');
             }
         });
     });
-    function loadIndex() {
-        const indexTable = new DataTableManager("#index-table", {
+</script>
+<script type="text/javascript">
+    function loadIndex()
+    {
+        indexTable = new DataTableManager("#index-table", {
             bServerSide: true,
             ajax: {
                 url: module + "/ajax/type/table/source/index",
@@ -202,13 +248,67 @@ $this->load->view('sistem/v_breadcrumb');
             aoColumnDefs: [
                 {bSortable: false, aTargets: [0,6]},
                 {bSearchable: false, aTargets: [0,6]},
-                {sClass: "center", aTargets: [0, 1, 2, 3, 4, 5]},
-                {sClass: "center nowrap", aTargets: [6]}
+                {sClass: "center", aTargets: [0, 3, 4, 5]},
+                {sClass: "center nowrap", aTargets: [1,2,6]}
             ]
         }).init();
         $("#btn-search").click(function () {
             indexTable.reload();
+            loadRekap();
         });
+    }
+    function loadRekap()
+    {
+        $("#one-spin").show();
+        $('#rekap-table thead').html('');
+        if ($.fn.dataTable.isDataTable('#rekap-table')) {
+            $('#rekap-table').DataTable().clear().destroy();
+        }
+        jsfRequest(module + "/ajax/type/table/source/rekap", "POST",
+        { 
+            pegawai: $("#pegawai").val(), jenis: $("#jenis").val(),
+            awal: $("#awal").val(), akhir : $("#akhir").val()
+        }, { useLoading: true })
+        .done(function(rs) {
+            if (rs.status) {
+                setTable(rs.data);
+            } else {
+                jsfNotif('Peringatan', rs.msg, 2, 'swal');
+            }
+            $("#one-spin").hide();
+        })
+        .fail(function(err) {
+            console.error("load:", err);
+        });
+    }
+    function setTable(res)
+    {
+        // ================= HEADER =================
+        var trHead = '<tr><th width="5%">#</th><th width="15%">Nama</th>';
+        $.each(res.periode, function(i, tgl) {
+            var date = new Date(tgl);
+            var hari = date.toLocaleDateString('id-ID', { weekday: 'short' });
+            var tglNum = date.getDate();
+
+            trHead += '<th>' + tglNum + '<br><small>' + hari + '</small></th>';
+        });
+        trHead += '<th width="10%">Kehadiran</th></tr>';
+        $('#rekap-table thead').html(trHead);
+        // ================= LOAD =================
+        rekapTable = $("#rekap-table").dataTable({
+            bScrollCollapse: true,
+            bAutoWidth: false, aaSorting: [],
+            aoColumnDefs: [
+                {
+                    bSortable: false,
+                    sClass: "center nowrap", aTargets: ["_all"]
+                }, { bSearchable: true, aTargets: [1] }
+            ]
+        });
+        $.each(res.table, function (index, value) {
+            rekapTable.fnAddData(value);
+        });
+        rekapTable.fnAdjustColumnSizing();
     }
     function getSelect()
     {

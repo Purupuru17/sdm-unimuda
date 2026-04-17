@@ -9,7 +9,7 @@ class Aktivitas_do extends KZ_Controller {
     
     function __construct() {
         parent::__construct();
-        $this->load->model(array('m_presensi'));
+        $this->load->model(['m_presensi']);
         $this->_pegawaiId();
     }
     function ajax() {
@@ -104,10 +104,9 @@ class Aktivitas_do extends KZ_Controller {
                 // STATUS LIMIT
                 $is_status ='TEPAT WAKTU';
                 $is_note = '';
-                if ($now > $jamLimit) {
-                    $diff = $jamLimit->diff($now);
-                    $menitTelat = ($diff->h * 60) + $diff->i;
-                    
+                $diff = $jamLimit->diff($now);
+                $menitTelat = ($diff->h * 60) + $diff->i;
+                if ($menitTelat > 0) {
                     $is_status = 'TERLAMBAT';
                     $is_note = $menitTelat.' Menit';
                 }

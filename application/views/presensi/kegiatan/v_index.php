@@ -64,6 +64,18 @@ $this->load->view('sistem/v_breadcrumb');
                     </div>
                 </div>
                 <div class="form-group">
+                    <label class="control-label col-xs-12 col-sm-2 no-padding-right">Validasi :</label>
+                    <div class="col-xs-12 col-sm-2">
+                        <div class="clearfix">
+                            <select class="select2 width-100" name="valid" id="valid" data-placeholder="---> Pilih Opsi <---">
+                                <option value=""></option>
+                                <option value="1"> YA </option>
+                                <option value="0"> TIDAK </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
                     <label class="control-label col-xs-12 col-sm-2 no-padding-right">Range :</label>
                     <div class="col-xs-12 col-sm-2">
                         <div class="clearfix">
@@ -103,6 +115,9 @@ $this->load->view('sistem/v_breadcrumb');
                             <a href="<?= site_url($module.'/add') ?>" class="btn btn-white btn-primary btn-bold">
                                 <i class="fa fa-plus-square bigger-110 blue"></i> Tambah Data
                             </a>
+                            <button class="btn btn-white btn-success btn-bold" id="btn-validate">
+                                <i class="fa fa-check bigger-110"></i> Validasi
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -111,10 +126,15 @@ $this->load->view('sistem/v_breadcrumb');
                         <table id="index-table" class="table table-striped table-bordered table-hover">
                             <thead>
                                 <tr>
-                                    <th>#</th>
+                                    <th width="5%">
+                                        <label class="pos-rel">
+                                            <input type="checkbox" class="ace ace-checkbox-2"/>
+                                            <span class="lbl"></span>
+                                        </label>
+                                    </th>
                                     <th>Pegawai</th>
                                     <th>Presensi</th>
-                                    <th>Lokasi</th>
+                                    <th>Validasi & Status</th>
                                     <th>Agenda</th>
                                     <th>Aksi</th>
                                 </tr>
@@ -170,8 +190,61 @@ $this->load->view('sistem/v_breadcrumb');
             }
         });
     });
-    function loadIndex() {
-        const indexTable = new DataTableManager("#index-table", {
+    $(document.body).on("click", "#desc-btn", function(e) {
+        e.preventDefault();
+        const prop = $(this).attr("itemprop");
+        bootbox.dialog({ message: `<p class="center">${prop}</p>`, backdrop: true, onEscape: true });
+    });
+    $("#index-table > thead > tr > th input[type=checkbox]").eq(0).on('click', function(){
+        var $row = $("#index-table > tbody > tr > td:first-child input[type='checkbox']");
+        if(!this.checked){
+            $row.prop('checked', false).closest('tr').removeClass('success');  
+        } else {
+            $row.prop('checked', true).closest('tr').addClass('success');
+        }
+    });
+    $("#index-table").on('click', 'td input[type=checkbox]' , function(){
+        var $row = $(this).closest('tr');
+        if(this.checked) $row.addClass('success');
+        else $row.removeClass('success');
+    });
+    $("#btn-validate").click(function(e) {
+        var rowcollection = indexTable.table.$("#is_select:checked", {"page": "all"});
+        var id = "";
+        var qty = 0;
+        rowcollection.each(function(index, elem) {
+            var checkbox_value = $(elem).val();
+            id += checkbox_value + ',';
+            qty++;
+        });
+        if(qty < 1){
+            jsfNotif('Peringatan', 'Tidak ada data yang dipilih', 2, 'swal');
+            return;
+        }
+        var title = "<h4 class='red center'><i class='ace-icon fa fa-exclamation-triangle red'></i> Peringatan !</h4>";
+        var msg = "<p class='center grey bigger-120'><i class='ace-icon fa fa-hand-o-right blue'></i>" + 
+                "<strong class='bigger-130 red'> " + qty + "</strong> <br> Data telah terpilih, klik Simpan untuk mengirim data!</p>";
+        bootbox.confirm({title: title, message: msg, 
+            buttons: {
+                cancel: {
+                    label: "<i class='ace-icon fa fa-times bigger-110'></i> Batal", className: "btn btn-sm"
+                },
+                confirm: {
+                    label: "<i class='ace-icon fa fa-paper-plane bigger-110'></i> Simpan", className: "btn btn-sm btn-success"
+                }
+            },
+            callback: function(result) {
+                if (result === true) {
+                    saveValidate(id);
+                }
+            }
+        });
+    });
+</script>
+<script type="text/javascript">
+    function loadIndex()
+    {
+        indexTable = new DataTableManager("#index-table", {
             bServerSide: true,
             ajax: {
                 url: module + "/ajax/type/table/source/index",
@@ -180,6 +253,7 @@ $this->load->view('sistem/v_breadcrumb');
                     val.pegawai = $("#pegawai").val();
                     val.jenis = $("#jenis").val();
                     val.status = $("#status").val();
+                    val.valid = $("#valid").val();
                     val.awal = $("#awal").val();
                     val.akhir = $("#akhir").val();
                 }
@@ -187,12 +261,30 @@ $this->load->view('sistem/v_breadcrumb');
             aoColumnDefs: [
                 {bSortable: false, aTargets: [0,5]},
                 {bSearchable: false, aTargets: [0,5]},
-                {sClass: "center", aTargets: [0, 1, 2, 3, 4]},
-                {sClass: "center nowrap", aTargets: [5]}
+                {sClass: "center", aTargets: [0, 4]},
+                {sClass: "center nowrap", aTargets: [1, 2, 3, 5]}
             ]
         }).init();
         $("#btn-search").click(function () {
             indexTable.reload();
+        });
+    }
+    function saveValidate(id)
+    {
+        jsfRequest(module + "_do/ajax/type/action/source/validate", "POST",
+        { 
+            id: id
+        }, { useLoading: true })
+        .done(function(rs) {
+            if (rs.status) {
+                indexTable.reload();
+                jsfNotif('Informasi', rs.msg, 1);
+            } else {
+                jsfNotif('Peringatan', rs.msg, 2, 'swal');
+            }
+        })
+        .fail(function(err) {
+            console.error("update:", err);
         });
     }
     function getSelect()

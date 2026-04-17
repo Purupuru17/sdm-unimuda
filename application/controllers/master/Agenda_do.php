@@ -16,7 +16,7 @@ class Agenda_do extends KZ_Controller {
         }
         $data['lokasi_id'] = decode($this->input->post('lokasi'));
         $data['jenis_agenda'] = $this->input->post('jenis');
-        $data['judul_agenda'] = eyd_text($this->input->post('judul'));
+        $data['judul_agenda'] = $this->input->post('judul');
         $data['petugas_agenda'] = strtoupper($this->input->post('petugas'));
         $data['waktu_agenda'] = $this->input->post('waktu');
         $data['limit_agenda'] = (int) $this->input->post('limit');
@@ -44,7 +44,7 @@ class Agenda_do extends KZ_Controller {
         }
         $data['lokasi_id'] = decode($this->input->post('lokasi'));
         $data['jenis_agenda'] = $this->input->post('jenis');
-        $data['judul_agenda'] = eyd_text($this->input->post('judul'));
+        $data['judul_agenda'] = $this->input->post('judul');
         $data['petugas_agenda'] = strtoupper($this->input->post('petugas'));
         $data['waktu_agenda'] = $this->input->post('waktu');
         $data['limit_agenda'] = (int) $this->input->post('limit');

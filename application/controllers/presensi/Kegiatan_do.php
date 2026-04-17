@@ -8,7 +8,7 @@ class Kegiatan_do extends KZ_Controller {
     
     function __construct() {
         parent::__construct();
-        $this->load->model(array('m_kegiatan'));
+        $this->load->model(['m_kegiatan']);
         $this->_pegawaiId();
     }
     function ajax() {
@@ -22,8 +22,35 @@ class Kegiatan_do extends KZ_Controller {
                 $this->_checkLocation();
             }else if ($routing_module['source'] == 'presensi') {
                 $this->_savePresensi();
+            }else if ($routing_module['source'] == 'validate') {
+                $this->_validPresensi();
             }
         }
+    }
+    function _validPresensi() {
+        
+        $id = array_filter(explode(",", $this->input->post('id')));
+        if(empty($id) || !is_array($id)){
+            jsonResponse(array('status' => FALSE, 'msg' => 'Tidak ada data yang dipilih'));
+        }
+        $success = array();
+        $error = array();
+        foreach ($id as $newId) {
+            if(!empty(decode($newId))){
+                
+                $update = $this->m_kegiatan->update(decode($newId), ['validasi' => '1']);
+                if($update){
+                    $success[] = $newId;
+                }else{
+                    $error[] = $newId;
+                }
+            }
+        }
+        if(count($success) < 1){
+            jsonResponse(array('status' => FALSE, 'msg' => count($error).' Data gagal diubah'));
+        }
+        jsonResponse(array('status' => TRUE, 'msg' => count($success).' Data berhasil diubah | '
+            .count($error).' Data gagal diubah'));
     }
     function _checkLocation()
     {
@@ -102,12 +129,15 @@ class Kegiatan_do extends KZ_Controller {
             jsonResponse(['status' => false, 'msg' => 'Sudah presensi sebelumnya']);
         }
         // STATUS LIMIT
-        $is_status = ($now > $jamLimit) ? 'TERLAMBAT' : 'TEPAT WAKTU';
+        $diff = $jamLimit->diff($now);
+        $menitTelat = ($diff->h * 60) + $diff->i;
+        $is_status = ($menitTelat > 0) ? 'TERLAMBAT' : 'TEPAT WAKTU';
         
         //SAVE
         $data['pegawai_id'] = $this->pid;
         $data['agenda_id'] = $id;
         $data['status'] = $is_status;
+        $data['validasi'] = '0';
         $data['waktu'] = date('Y-m-d H:i:s');
         $data['lokasi'] = $lokasi;
         $data['latitude'] = $latitude;

@@ -15,7 +15,7 @@ class M_kegiatan extends KZ_Model {
                     ['m_pegawai pg','pg.id_pegawai = p.pegawai_id','left'],
                     ['aik_agenda a','a.id_agenda = p.agenda_id','left'],
                 ],
-            'columns'    => [null,'nama','waktu','lokasi','status',null],
+            'columns'    => [null,'nama','waktu','validasi','waktu_agenda',null],
             'searchable' => ['nik','nama'],
             'order'      => ['waktu' => 'desc']
         ];
@@ -31,14 +31,22 @@ class M_kegiatan extends KZ_Model {
             
             $btn_loc = '<br><a href="https://www.google.com/maps/search/?api=1&query='.$items['latitude'].','.$items['longitude'].'" 
                     target="_blank" class="">'.$items['lokasi'].'</a>';
+            $btn_pop = '<a href="#" class="bolder grey" itemprop="'. ctk($items['judul_agenda'],1) .'" id="desc-btn">'
+                .$items['jenis_agenda'].' <i class="fa fa-external-link"> </i></a>';
             
+            
+            $box = ($items['validasi'] != '1') ? ' <label class="pos-rel">
+                <input value="'. encode($items['id']).'" name="is_select[]" id="is_select"
+                    type="checkbox" class="ace ace-checkbox-2" />
+                <span class="lbl"></span></label>' : '';
+
             $row = [];
-            $row[] = ctk($no);
+            $row[] = $no.' '.$box;
             $row[] = '<strong>'.ctk($items['nama']).'</strong><br><span class="grey">'
                     .ctk($items['nik']).'</span>';
-            $row[] = '<strong>'.format_date($items['waktu'],2).'</strong><br>'.st_mhs($items['status']);
-            $row[] = $items['jenis_agenda'].$btn_loc;
-            $row[] = format_date($items['waktu_agenda'],0).'<br><small>'. limit_text($items['judul_agenda'], 50).'</small>';
+            $row[] = '<strong>'.format_date($items['waktu'],2).'</strong>'.$btn_loc;
+            $row[] = st_aktif($items['validasi'],'yn').' &nbsp'.st_mhs($items['status']);
+            $row[] = $btn_pop.'<br><small>'. format_date($items['waktu_agenda'],0).'</small>';
             $row[] = '<div class="action-buttons">'.$btn_aksi.'</div>';
 
             $data[] = $row;

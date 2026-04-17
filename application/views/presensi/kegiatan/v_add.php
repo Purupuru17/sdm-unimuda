@@ -159,13 +159,13 @@ load_js(array(
     }
     function successGPS(pos){
         //SAMPLE
-//        let lat = -1.1166459318;
-//        let lng = 131.2857774324;
-//        let accuracy = 10;
+        let lat = -1.1166459318;
+        let lng = 131.2857774324;
+        let accuracy = 10;
         
-        let lat = pos.coords.latitude;
-        let lng = pos.coords.longitude;
-        let accuracy = pos.coords.accuracy;
+//        let lat = pos.coords.latitude;
+//        let lng = pos.coords.longitude;
+//        let accuracy = pos.coords.accuracy;
         
         $("#alamat").html(`<i class="fa fa-spinner fa-spin fa-fw fa-2x"></i> 
             Mencari lokasi akurat, tunggu sebentar . . . (`+Math.round(accuracy)+` meter)`);
@@ -247,7 +247,7 @@ load_js(array(
 
                 setTimeout(function () {
                     window.location.replace(module);
-                }, 3000);
+                }, 2000);
             } else {
                 jsfNotif('Peringatan', rs.msg, 2, 'swal');
             }

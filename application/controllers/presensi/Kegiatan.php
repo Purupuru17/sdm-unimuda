@@ -83,6 +83,7 @@ class Kegiatan extends KZ_Controller {
         $pegawai = decode($this->input->post('pegawai'));
         $jenis = $this->input->post('jenis');
         $status = $this->input->post('status');
+        $valid = $this->input->post('valid');
         $awal = $this->input->post('awal');
         $akhir = $this->input->post('akhir');
         
@@ -97,6 +98,9 @@ class Kegiatan extends KZ_Controller {
         }
         if ($status != '') {
             $where['status'] = $status;
+        }
+        if ($valid != '') {
+            $where['validasi'] = $valid;
         }
         if ($awal != '') {
             $where['DATE(waktu) >='] = $awal;

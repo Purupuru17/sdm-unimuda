@@ -168,6 +168,7 @@
                     { useLoading: true })
                 .done(function(rs) {
                     if (rs.status) {
+                        $(formEl).hide();
                         jsfNotif('Informasi', rs.msg, 1, 'swal');
                         setTimeout(() => window.location.replace(rs.data), 2000);
                     } else {

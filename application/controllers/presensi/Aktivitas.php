@@ -8,7 +8,7 @@ class Aktivitas extends KZ_Controller {
     
     function __construct() {
         parent::__construct();
-        $this->load->model(array('m_presensi'));
+        $this->load->model(['m_presensi']);
         $this->_pegawaiId();
     }
     function index() {
@@ -74,6 +74,8 @@ class Aktivitas extends KZ_Controller {
             //TABLE
             if($routing_module['source'] == 'index') {
                 $this->_tableIndex();
+            } else if($routing_module['source'] == 'rekap') {
+                $this->_tableRekap();
             }
         }else if($routing_module['type'] == 'list') {
             //TABLE
@@ -113,7 +115,113 @@ class Aktivitas extends KZ_Controller {
         $datatables = $this->m_presensi->getDatatables($where, ['module' => $this->module, 'level' => $this->sessionlevel]);
         jsonResponse($datatables);
     }
-    function _listPegawai(){
+    function _tableRekap()
+    {
+        $this->load->model(['m_pegawai']);
+        
+        $pegawai = decode($this->input->post('pegawai'));
+        $jenis = $this->input->post('jenis');
+        $awal = $this->input->post('awal');
+        $akhir = $this->input->post('akhir');
+        
+        if(empty($awal) || empty($akhir)){
+            jsonResponse(array('status' => false, 'msg' => 'Data tidak ditemukan'));
+        }
+        $where['tgl_presensi >='] = $awal;
+        $where['tgl_presensi <='] = $akhir;
+        if ($jenis != '') {
+            $where['jenis_pegawai'] = $jenis;
+        }
+        if ($pegawai != '') {
+            $where['pegawai_id'] = $pegawai;
+        }
+        if(!empty($this->pid) && ($this->sessionlevel != '1')){
+            $where['pegawai_id'] = $this->pid;
+        }
+        $options = [
+            'alias'      => 'p',
+            'select'     => 'p.id_pegawai, p.nama, p.nik, pr.tgl_presensi, pr.status_presensi',
+            'join'       => [ 
+                ['m_presensi pr','pr.pegawai_id = p.id_pegawai','left'],
+            ],
+            'order'      => 'nama ASC'
+        ];
+        $result = $this->m_pegawai->all($where, $options); 
+        if($result['rows'] < 1){
+            jsonResponse(array('status' => false, 'msg' => 'Data tidak ditemukan'));
+        }
+        // ================= RANGE TANGGAL =================
+        $start = new DateTime($awal);
+        $end   = new DateTime($akhir);
+        $periode = [];
+        while ($start <= $end) {
+            $periode[] = $start->format('Y-m-d');
+            $start->modify('+1 day');
+        }
+        $pivot = [];
+        // ================= PIVOT =================
+        foreach ($result['data'] as $row) {            
+            // init pegawai
+            if (!isset($pivot[$row['id_pegawai']])) {
+                $arr_item = [
+                    'nama' => '<strong>'.ctk($row['nama']).
+                    '</strong><br><span class="grey">'.ctk($row['nik']).'</span>'
+                ];
+                // init semua tanggal null
+                foreach ($periode as $tgl) {
+                    $arr_item[$tgl] = null;
+                }
+                $pivot[$row['id_pegawai']] = $arr_item;
+            }
+            if (!empty($row['tgl_presensi'])) {
+                $tgl = date('Y-m-d', strtotime($row['tgl_presensi']));
+                $pivot[$row['id_pegawai']][$tgl] = $row['status_presensi'];
+            }
+        }
+        // ================= JADI TABLE =================
+        $data = ['table' => []];
+        $no = 1;
+        foreach ($pivot as $item) {
+
+            $rows = [];
+            $rows[] = $no;
+            $rows[] = $item['nama'];
+            
+            $jml_tepat = 0;
+            $jml_lambat = 0;
+            $jml_kosong = 0;
+
+            foreach ($periode as $tgl) {
+
+                $val = $item[$tgl] ?? null;
+
+                if ($val === 'TEPAT WAKTU') {
+                    $html = '<i class="fa fa-calendar-check-o green bigger-150"></i>';
+                    $jml_tepat++;
+                } else if ($val === 'TERLAMBAT') {
+                    $html = '<i class="fa fa-calendar-check-o orange bigger-120"></i>';
+                    $jml_lambat++;
+                } else {
+                    $html = '<i class="fa fa-calendar-times-o grey"></i>';
+                    $jml_kosong++;
+                }
+
+                $rows[] = $html;
+            }
+            $total = count($periode);
+            $persen = $total ? round((($jml_tepat+$jml_lambat) / $total) * 100) : 0;
+            
+            $rows[] = '(<b>'.$persen.'%</b>)<br><small>'.$jml_tepat.' TEPAT - '.$jml_lambat.' TERLAMBAT</small>';
+
+            $data['table'][] = $rows;
+            $no++;
+        }
+        $data['periode'] = $periode;
+        
+        jsonResponse(array('data' => $data, 'status' => true, 'msg' => 'Data ditemukan'));
+    }
+    function _listPegawai()
+    {
         $this->load->model(array('m_pegawai'));
         
         $where = null;

@@ -47,8 +47,8 @@ class M_presensi extends KZ_Model {
             $row[] = '<strong>'.format_date($items['tgl_presensi'])
                 .'</strong><br> <small>Jam Kerja</small> : <strong class="blue">'.$jam_kerja.'</strong>';
             $row[] = '<strong class="green">'.$items['waktu_masuk'].'</strong><br>'.$btn_masuk;
-            $row[] = st_mhs($items['status_presensi']).'<br><small>'.$items['catat_presensi'].'</small>';
             $row[] = '<strong class="orange">'.$items['waktu_pulang'].'</strong><br>'.$btn_pulang;
+            $row[] = st_mhs($items['status_presensi']).' <br><small>'.$items['catat_presensi'].'</small>';
             $row[] = '<div class="action-buttons">'.$btn_aksi.'</div>';
 
             $data[] = $row;

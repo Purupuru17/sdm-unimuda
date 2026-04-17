@@ -358,7 +358,7 @@ load_js(array(
 
                 setTimeout(function () {
                     window.location.replace(module);
-                }, 3000);
+                }, 2000);
             } else {
                 jsfNotif('Peringatan', rs.msg, 2, 'swal');
             }

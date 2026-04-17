@@ -4,7 +4,11 @@
 - 
 
 
-
 #DONE
 - Bedakan dosen dan staf biasa, filter di aktivitas
 - Loading saat take foto
+
+
+#DB
+- kolom validasi d aik_presensi
+- atasan -> m_jabatan
