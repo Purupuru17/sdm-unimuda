@@ -12,7 +12,7 @@ class M_presensi extends KZ_Model {
             'alias'      => 'p',
             'select'     => 'p.*, pg.nama, pg.nik, pg.jenis_pegawai',
             'join'       => [ ['m_pegawai pg','pg.id_pegawai = p.pegawai_id','left'] ],
-            'columns'    => [null,'nama','tgl_presensi','waktu_masuk','status_presensi','waktu_pulang',null],
+            'columns'    => [null,'nama','tgl_presensi','waktu_masuk','waktu_pulang','status_presensi',null],
             'searchable' => ['nik','nama'],
             'order'      => ['created_at' => 'desc']
         ];

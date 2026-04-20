@@ -104,11 +104,14 @@ class Aktivitas_do extends KZ_Controller {
                 // STATUS LIMIT
                 $is_status ='TEPAT WAKTU';
                 $is_note = '';
-                $diff = $jamLimit->diff($now);
-                $menitTelat = ($diff->h * 60) + $diff->i;
-                if ($menitTelat > 0) {
-                    $is_status = 'TERLAMBAT';
-                    $is_note = $menitTelat.' Menit';
+                if ($now > $jamLimit) {
+                    $diff = $jamLimit->diff($now);
+                    $menitTelat = ($diff->h * 60) + $diff->i;
+                    
+                    if ($menitTelat > 0) {
+                        $is_status = 'TERLAMBAT';
+                        $is_note = $menitTelat.' Menit';
+                    }
                 }
                 //SAVE
                 $data['pegawai_id'] = $this->pid;

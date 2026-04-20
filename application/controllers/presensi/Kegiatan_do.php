@@ -28,7 +28,9 @@ class Kegiatan_do extends KZ_Controller {
         }
     }
     function _validPresensi() {
-        
+        if($this->sessionlevel != '1'){
+            jsonResponse(array('status' => FALSE, 'msg' => 'Tidak memilik akses'));
+        }
         $id = array_filter(explode(",", $this->input->post('id')));
         if(empty($id) || !is_array($id)){
             jsonResponse(array('status' => FALSE, 'msg' => 'Tidak ada data yang dipilih'));

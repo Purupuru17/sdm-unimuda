@@ -24,18 +24,21 @@ class M_kegiatan extends KZ_Model {
         $no = $this->input->post('start');
         foreach ($result['data'] as $items) {
             $no++;
-            $btn_aksi = ($param['level'] != '1') ? '' : '<a href="#" itemid="'. encode($items['id']) .'" itemprop="'. ctk($items['nama']) .'" id="delete-btn" 
+            
+            $btn_aksi = ($items['validasi'] != '1' && $param['level'] == '1') ? '<a href="#" 
+                itemid="'. encode($items['id']) .'" itemprop="'. ctk($items['nama']) .'" id="valid-btn" 
+                    class="tooltip-success btn btn-white btn-success btn-sm btn-round" data-rel="tooltip" title="Validasi">
+                    <span class="green"><i class="ace-icon fa fa-check-square-o bigger-120"></i></span>
+                </a><a href="#" itemid="'. encode($items['id']) .'" itemprop="'. ctk($items['nama']) .'" id="delete-btn" 
                     class="tooltip-error btn btn-white btn-danger btn-mini btn-round" data-rel="tooltip" title="Hapus Data">
                     <span class="red"><i class="ace-icon fa fa-trash-o"></i></span>
-                </a>';
-            
+                </a>' : '';
             $btn_loc = '<br><a href="https://www.google.com/maps/search/?api=1&query='.$items['latitude'].','.$items['longitude'].'" 
-                    target="_blank" class="">'.$items['lokasi'].'</a>';
+                    target="_blank" class="smaller-90">'.$items['lokasi'].'</a>';
             $btn_pop = '<a href="#" class="bolder grey" itemprop="'. ctk($items['judul_agenda'],1) .'" id="desc-btn">'
                 .$items['jenis_agenda'].' <i class="fa fa-external-link"> </i></a>';
             
-            
-            $box = ($items['validasi'] != '1') ? ' <label class="pos-rel">
+            $box = ($items['validasi'] != '1' && $param['level'] == '1') ? ' <label class="pos-rel">
                 <input value="'. encode($items['id']).'" name="is_select[]" id="is_select"
                     type="checkbox" class="ace ace-checkbox-2" />
                 <span class="lbl"></span></label>' : '';
@@ -46,7 +49,7 @@ class M_kegiatan extends KZ_Model {
                     .ctk($items['nik']).'</span>';
             $row[] = '<strong>'.format_date($items['waktu'],2).'</strong>'.$btn_loc;
             $row[] = st_aktif($items['validasi'],'yn').' &nbsp'.st_mhs($items['status']);
-            $row[] = $btn_pop.'<br><small>'. format_date($items['waktu_agenda'],0).'</small>';
+            $row[] = $btn_pop.'<br><small>'. format_date($items['waktu_agenda'],2).'</small>';
             $row[] = '<div class="action-buttons">'.$btn_aksi.'</div>';
 
             $data[] = $row;

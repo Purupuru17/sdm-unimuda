@@ -115,7 +115,7 @@ $this->load->view('sistem/v_breadcrumb');
                             <a href="<?= site_url($module.'/add') ?>" class="btn btn-white btn-primary btn-bold">
                                 <i class="fa fa-plus-square bigger-110 blue"></i> Tambah Data
                             </a>
-                            <button class="btn btn-white btn-success btn-bold" id="btn-validate">
+                            <button class="btn btn-white btn-success btn-bold <?= $this->session->userdata('level') == '1' ? '':'hide' ?>" id="btn-validate">
                                 <i class="fa fa-check bigger-110"></i> Validasi
                             </button>
                         </div>
@@ -186,6 +186,29 @@ $this->load->view('sistem/v_breadcrumb');
                     var form = $('<form>', { method: 'POST', action: module + '/delete' });
                     form.append($('<input>', { type: 'hidden', name: 'id', value: id }));
                     $('body').append(form);form.submit();
+                }
+            }
+        });
+    });
+    $(document.body).on("click", "#valid-btn", function(e) {
+        e.preventDefault();
+        var id = $(this).attr("itemid");
+        var name = $(this).attr("itemprop");
+        var title = "<h4 class='red center'><i class='ace-icon fa fa-exclamation-triangle red'></i> Peringatan !</h4>";
+        var msg = "<p class='center grey bigger-120'><i class='ace-icon fa fa-hand-o-right blue'></i>" + 
+                " Apakah anda yakin akan memvalidasi data <br/><b>" + name + "</b> ? </p>";
+        bootbox.confirm({title: title, message: msg, 
+            buttons: {
+                cancel: {
+                    label: "<i class='ace-icon fa fa-times bigger-110'></i> Batal", className: "btn btn-sm"
+                },
+                confirm: {
+                    label: "<i class='ace-icon fa fa-paper-plane bigger-110'></i> Simpan", className: "btn btn-sm btn-success"
+                }
+            },
+            callback: function(result) {
+                if (result === true) {
+                    saveValidate(id);
                 }
             }
         });
