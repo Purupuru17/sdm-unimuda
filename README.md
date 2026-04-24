@@ -1,7 +1,7 @@
 #NOTE
 - Cek lg create at dan update at, gnt log at m_pegawai dan m_presensi
-- 
-- 
+- pindah _pivotPresensi
+- export aik presensi
 
 
 #DONE
@@ -12,3 +12,4 @@
 #DB
 - kolom validasi d aik_presensi
 - atasan -> m_jabatan
+- foto -> aik_presensi

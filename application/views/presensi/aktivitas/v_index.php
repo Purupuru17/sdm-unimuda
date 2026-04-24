@@ -267,8 +267,8 @@ $this->load->view('sistem/v_breadcrumb');
             html += `<td>PULANG<br><img src="${ftpulang}" class="img-thumbnail" width="90%"/><br>${wkpulang}</td>`;
         }
         html += `</tr></table>`;
-        if(status){           
-            bootbox.dialog({title: `<h4 class="center">${status}</h4>`, message: html, backdrop: true, onEscape: true, size: 'small'}); 
+        if(status){
+            bootbox.dialog({title: `<h4 class="center">${status}</h4>`, message: html, backdrop: true, onEscape: true}); 
         }
     });
 </script>

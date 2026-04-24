@@ -295,7 +295,7 @@ load_js(array(
             jsfNotif('Peringatan', 'Lokasi tidak ditemukan', 2, 'swal');
             return;
         }
-        $("#preview").hide();
+        $("#preview").attr("src", "").hide();
         $("#video").show();
         $("#foto").val("");
         //Buka Kamera
@@ -389,7 +389,7 @@ load_js(array(
                 if (error) {
                     jsfNotif('Peringatan', error, 2, 'swal');
                     return false;
-                }
+                }                
                 const title = `<h4 class="red center"><i class="ace-icon fa fa-exclamation-triangle red"></i> Peringatan !</h4>`;
                 const msg = `<p class="center grey bigger-120"><i class="ace-icon fa fa-hand-o-right blue"></i>
                      Apakah anda yakin akan menyimpan data ? </p>`;

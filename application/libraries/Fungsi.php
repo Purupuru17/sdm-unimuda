@@ -79,6 +79,35 @@ class Fungsi {
             return NULL;
         }
     }
+    function imgUpBase64($base64, $name, $path)
+    {
+        if (!$base64) {
+            return ['data' => '', 'msg' => 'Foto masih kosong'];
+        }
+        // validasi format
+        if (!preg_match('/^data:image\/(\w+);base64,/', $base64, $type)) {
+            return ['data' => '', 'msg' => 'Format tidak valid'];
+        }
+        $imageType = strtolower($type[1]); // jpeg/png/webp
+        if (!in_array($imageType, ['jpg','jpeg','png','webp'])) {
+            return ['data' => '', 'msg' => 'Tipe tidak diizinkan'];
+        }
+        // ambil data base64 nya
+        $base64sub = substr($base64, strpos($base64, ',') + 1);
+        $base64str = str_replace(' ', '+', $base64sub);
+        $imageData = base64_decode($base64str);
+        if ($imageData === false) {
+            return ['data' => '', 'msg' => 'Foto tidak ditemukan'];
+        }
+        // generate nama file
+        $fileName = $name . '.' . $imageType;
+        $new_path = FCPATH . $path . $fileName;
+        // simpan file
+        if (!file_put_contents($new_path, $imageData)) {
+            return ['data' => '', 'msg' => 'Foto gagal diupload'];
+        }
+        return ['data' => $path.$fileName, 'msg' => 'Foto berhasil diupload'];
+    }
     function PdfGenerate($html, $filename='', $attach = 0 ,$paper = 'A4', $orientation = 'portrait', $stream = TRUE) {
         $tmp = sys_get_temp_dir();
         if (ob_get_level()) {

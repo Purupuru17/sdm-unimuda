@@ -123,7 +123,22 @@ class Aktivitas extends KZ_Controller {
         if(!$this->fungsi->Validation($this->rules_export, 'ajax')){
             jsonResponse(['status' => false, 'msg' => validation_errors()]);
         }
-        $pivot = $this->_pivotPresensi();
+        $jenis = $this->input->post('jenis');
+        $awal = $this->input->post('awal');
+        $akhir = $this->input->post('akhir');
+        
+        $where['tgl_presensi >='] = $awal;
+        $where['tgl_presensi <='] = $akhir;
+        if ($jenis != '') {
+            $where['jenis_pegawai'] = $jenis;
+        }
+        if(!empty($this->pid) && ($this->sessionlevel != '1')){
+            $where['pegawai_id'] = $this->pid;
+        }
+        $pivot = $this->m_presensi->pivotData($where, $awal, $akhir);
+        if(empty($pivot['data'])){
+            jsonResponse(array('status' => false, 'msg' => 'Data tidak ditemukan'));
+        }
         // ================= PIVOT TABLE =================
         $data = ['table' => []];
         $no = 1;
@@ -203,10 +218,11 @@ class Aktivitas extends KZ_Controller {
         }
         jsonResponse($data);
     }
-    function _pivotPresensi($type = null) 
+    function export()
     {
-        $this->load->model(['m_pegawai']);
-        
+        if(!$this->fungsi->Validation($this->rules_export)){
+            redirect($this->module);
+        }
         $jenis = $this->input->post('jenis');
         $awal = $this->input->post('awal');
         $akhir = $this->input->post('akhir');
@@ -219,72 +235,16 @@ class Aktivitas extends KZ_Controller {
         if(!empty($this->pid) && ($this->sessionlevel != '1')){
             $where['pegawai_id'] = $this->pid;
         }
-        $options = [
-            'alias'      => 'p',
-            'select'     => 'p.id_pegawai, p.nama, p.nik, p.jenis_pegawai,
-                pr.tgl_presensi, pr.status_presensi, pr.waktu_masuk, pr.waktu_pulang, pr.foto_masuk, pr.foto_pulang',
-            'join'       => [ 
-                ['m_presensi pr','pr.pegawai_id = p.id_pegawai','left'],
-            ],
-            'order'      => 'nama ASC'
-        ];
-        $result = $this->m_pegawai->all($where, $options); 
-        if($result['rows'] < 1){
-            if(empty($type)){
-                jsonResponse(array('status' => false, 'msg' => 'Data tidak ditemukan'));
-            } else {
-                $this->session->set_flashdata('notif', notif('warning', 'Peringatan', 'Data tidak ditemukan'));
-                redirect($this->module);
-            }
+        $pivot = $this->m_presensi->pivotData($where, $awal, $akhir);
+        if(empty($pivot['data'])){
+            $this->session->set_flashdata('notif', notif('warning', 'Peringatan', 'Data tidak ditemukan'));
+            redirect($this->module);
         }
-        // ================= RANGE TANGGAL =================
-        $start = new DateTime($awal);
-        $end   = new DateTime($akhir);
-        $periode = [];
-        while ($start <= $end) {
-            $periode[] = $start->format('Y-m-d');
-            $start->modify('+1 day');
-        }
-        // ================= PIVOT =================
-        $pivot = [];
-        foreach ($result['data'] as $row) {            
-            // init pegawai
-            if (!isset($pivot[$row['id_pegawai']])) {
-                $arr_item = [
-                    'nama' => $row['nama'],
-                    'nik' => $row['nik'],
-                    'jenis' => $row['jenis_pegawai']
-                ];
-                // init semua tanggal null
-                foreach ($periode as $tgl) {
-                    $arr_item[$tgl] = null;
-                }
-                $pivot[$row['id_pegawai']] = $arr_item;
-            }
-            if (!empty($row['tgl_presensi'])) {
-                $tgl = date('Y-m-d', strtotime($row['tgl_presensi']));
-                $pivot[$row['id_pegawai']][$tgl] = [
-                    'status' => $row['status_presensi'],
-                    'masuk'  => $row['waktu_masuk'],
-                    'pulang' => $row['waktu_pulang'],
-                    'fotomasuk' => $row['foto_masuk'],
-                    'fotopulang' => $row['foto_pulang'],
-                ];
-            }
-        }
-        return [
-            'data' => $pivot, 'periode' => $periode, 'count' => count($periode),
-            'awal' => $awal, 'akhir' => $akhir
-        ];
-    }
-    function export()
-    {
-        $pivot = $this->_pivotPresensi('export');
-        
+        // ================= PIVOT EXCEL =================
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('REKAP');
-        $title = 'Presensi '.format_date($pivot['awal'],1).' sd '.format_date($pivot['akhir'],1);
+        $title = 'Presensi '.format_date($awal,1).' sd '.format_date($akhir,1);
              
         $rowHeader1 = 1;
         $rowHeader2 = 2;

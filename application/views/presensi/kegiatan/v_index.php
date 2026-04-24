@@ -190,6 +190,18 @@ $this->load->view('sistem/v_breadcrumb');
             }
         });
     });
+    $(document.body).on("click", "#img-btn", function(e) {
+        e.preventDefault();
+        const id = $(this).attr("itemid");
+        const title = "<h4 class='blue center'><i class='ace-icon fa fa-image'></i> Foto </h4>";
+        const msg = `<p class="center"><img src="${id}" class="img-thumbnail" width="70%"/> </p>`;
+        bootbox.dialog({ title: title, message: msg, backdrop: true, onEscape: true });
+    });
+    $(document.body).on("click", "#desc-btn", function(e) {
+        e.preventDefault();
+        const prop = $(this).attr("itemprop");
+        bootbox.dialog({ message: `<p class="center">${prop}</p>`, backdrop: true, onEscape: true });
+    });
     $(document.body).on("click", "#valid-btn", function(e) {
         e.preventDefault();
         var id = $(this).attr("itemid");
@@ -212,11 +224,6 @@ $this->load->view('sistem/v_breadcrumb');
                 }
             }
         });
-    });
-    $(document.body).on("click", "#desc-btn", function(e) {
-        e.preventDefault();
-        const prop = $(this).attr("itemprop");
-        bootbox.dialog({ message: `<p class="center">${prop}</p>`, backdrop: true, onEscape: true });
     });
     $("#index-table > thead > tr > th input[type=checkbox]").eq(0).on('click', function(){
         var $row = $("#index-table > tbody > tr > td:first-child input[type='checkbox']");

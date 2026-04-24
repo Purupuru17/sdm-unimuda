@@ -45,9 +45,9 @@ if (!function_exists('st_aktif')) {
         return $status;
     }
 }
-if (!function_exists('st_mhs')) {
+if (!function_exists('st_label')) {
 
-    function st_mhs($value, $type = NULL) {
+    function st_label($value, $type = NULL) {
         $warning = array('PROSES');
         $info = array('VALID');
         $success = array('AKTIF','SELESAI','TEPAT WAKTU');
@@ -67,75 +67,6 @@ if (!function_exists('st_mhs')) {
         return !empty($type) ? '<span class="label label-'.$type.' arrowed-in-right arrowed">'.$value.'</span>':$status;
     }
 
-}
-if (!function_exists('st_sinkron')) {
-
-    function st_sinkron($value) {
-
-        if ($value == '1') {
-            $status = '<span><i class="ace-icon fa fa-check green bigger-110"></i></span>';
-        } else if ($value == '2') {
-            $status = '<span><i class="ace-icon fa fa-times red bigger-110"></i></span>';
-        } else if (strlen($value) >= 10) {
-            $status = '<span><i class="ace-icon fa fa-check green bigger-110"></i></span>';
-        } else {
-            $status = '<span><i class="ace-icon fa fa-question orange bigger-110"></i></span>';
-        }
-        return $status;
-    }
-}
-if (!function_exists('st_soal')) {
-
-    function st_soal($quiz, $is_done = false) {
-        switch ($quiz['status_quiz']) {
-            case '0': $val = 'btn-default';
-                break;
-            case '1': $val = 'btn-info';
-                break;
-            case '2': $val = 'btn-yellow';
-                break;
-            default : $val = '';
-                break;
-        }
-        if($is_done){
-            switch ($quiz['valid_quiz']) {
-                case '0': $val = 'btn-danger';
-                    break;
-                case '1': $val = 'btn-success';
-                    break;
-                default : $val = '';
-                    break;
-            }
-        }
-        return $val;
-    }
-}
-if (!function_exists('range_date')) {
-
-    function range_date($check_date, $start_date, $end_date) {
-        // Convert to timestamp
-        $start_ts = strtotime($start_date);
-        $end_ts = strtotime($end_date);
-        $check_ts = strtotime($check_date);
-        
-        $diff = $end_ts - $check_ts;
-        $jam   = floor($diff / (60 * 60));
-        $menit = $diff - ( $jam * (60 * 60) );
-        $detik = $diff % 60;
-        
-        if( ($check_ts >= $start_ts) && ($check_ts <= $end_ts) ){
-            $st = TRUE;
-            $rs = $jam .  ' Jam - ' . floor( $menit / 60 ) . ' Menit - ' . $detik . ' Detik' ;
-            //$rs = $jam .  ':' . floor( $menit / 60 ) . ':' . $detik;
-        }else if($check_ts < $start_ts){
-            $st = FALSE;
-            $rs = 'Sesi Ini Belum Dimulai';
-        }else{
-            $st = FALSE;
-            $rs = 'Sesi Ini Telah Berakhir';
-        }
-        return [ 'rs' => $rs, 'st' => $st ];
-    }
 }
 if (!function_exists('eyd_text')) {
     
@@ -173,11 +104,6 @@ if (!function_exists('load_array')) {
                     array('id' => '1', 'txt' => 'AKTIF'),array('id' => '0', 'txt' => 'TIDAK AKTIF')
                 );
                 break;
-            case 'st_valid':
-                $val = array(
-                    'PENGAJUAN','VALID','TUNDA'
-                );
-                break;
             case 'tahun':
                 $awal = intval(date('Y'));
                 for($i = 2017; $i <= $awal + 1; $i++ ){
@@ -185,14 +111,10 @@ if (!function_exists('load_array')) {
                 }
                 break;
             case 'status':
-                $val = array(
-                    'PENDING', 'PROSES', 'VALID' ,'SELESAI', 'AKTIF', 'TIDAK AKTIF'
-                );
+                $val = ['PENDING', 'PROSES', 'VALID' ,'SELESAI', 'AKTIF', 'TIDAK AKTIF'];
                 break;
             case 'agama':
-                $val = array(
-                    'Islam', 'Kristen', 'Katolik', 'Hindu', 'Budha', 'Konghucu', 'Lainnya'
-                );
+                $val = ['Islam', 'Kristen', 'Katolik', 'Hindu', 'Budha', 'Konghucu', 'Lainnya'];
                 break;
             case 'jenis_pegawai':
                 $val = ['DOSEN','PEGAWAI','PARTTIME'];

@@ -53,6 +53,9 @@ class Kegiatan extends KZ_Controller {
         }
         $result = $this->m_kegiatan->delete($id);
         if ($result) {
+            // DELETE FOTO
+            (is_file($get['foto'])) ? unlink($get['foto']) : false;
+            
             $this->session->set_flashdata('notif', notif('success', 'Informasi', 'Data berhasil dihapus'));
             redirect($this->module);
         } else {
@@ -112,7 +115,8 @@ class Kegiatan extends KZ_Controller {
         $datatables = $this->m_kegiatan->getDatatables($where, ['module' => $this->module, 'level' => $this->sessionlevel]);
         jsonResponse($datatables);
     }
-    function _listPegawai(){
+    function _listPegawai()
+    {
         $this->load->model(array('m_pegawai'));
         
         $where = null;

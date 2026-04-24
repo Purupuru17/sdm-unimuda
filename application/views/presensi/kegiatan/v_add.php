@@ -68,6 +68,33 @@
                         <span id="alamat" class="middle blue"></span>
                     </span>
                 </div>
+                <div class="form-group">
+                    <label class="control-label col-xs-12 col-sm-5 no-padding-right">
+                        <button onclick="restartFoto()" id="btn-kamera"
+                            class="btn btn-bold btn-warning btn-white btn-sm" type="button">
+                            <i class="ace-icon fa fa-camera"></i>
+                            Buka Kamera
+                        </button>
+                    </label>
+                    <div class="col-xs-12 col-sm-5">
+                        <div class="clearfix">
+                            <video id="video" autoplay playsinline class="img-thumbnail" style="display: none; max-width: 320px; transform: scaleX(-1)"></video>
+                            <canvas id="canvas" style="display:none;"></canvas>
+                            
+                            <img id="preview" width="350" class="img-thumbnail" style="display: none">
+                            <input type="hidden" name="foto" id="foto">
+                        </div>
+                        <div class="space-2"></div>
+                        <button onclick="takeFoto()" style="display: none" id="btn-foto"
+                            class="btn btn-bold btn-success btn-white btn-sm" type="button">
+                            <i class="ace-icon fa fa-camera bigger-120"></i>
+                            Ambil Foto Selfie
+                        </button>
+                        <span id="spin-foto" class="middle blue" style="display: none">
+                            <i class="fa fa-spinner fa-spin fa-fw fa-2x"></i> Proses mendeteksi wajah dan mengambil gambar ...
+                        </span>
+                    </div>
+                </div>
                 <div class="clearfix form-actions">
                     <div class="col-sm-offset-5 col-sm-5">
                         <button class="btn btn-success" name="simpan" type="submit">
@@ -87,8 +114,12 @@ load_js(array(
     'theme/aceadmin/assets/js/jquery.validate.js'
 ));
 ?>
+<script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
 <script type="text/javascript">
     const module = "<?= site_url($module) ?>";
+    
+    let video = document.getElementById('video');
+    let streamGlobal;
     
     let watchID = null;
     let lokasiFix = false;
@@ -98,6 +129,7 @@ load_js(array(
         $(".select2").select2({allowClear: true});
         $(".select2-chosen").addClass("center");
         validateForm();
+        initFaceAPI();
     });
     $(document).on("focusin", "#latitude,#longitude,#lokasi", function() {
         $(this).prop('readonly', true);
@@ -115,7 +147,8 @@ load_js(array(
             restartGPS();
             $("#txt-agenda").html(text + '<hr class="space-2"><small>' + title + '</small>');
         }
-        $("#latitude, #longitude, #lokasi").val("");
+        $("#latitude, #longitude, #lokasi, #foto").val("");
+        $("#preview").attr("src", "").hide();
         $("#btn-gps").removeAttr("disabled");
     });
 </script>
@@ -159,13 +192,13 @@ load_js(array(
     }
     function successGPS(pos){
         //SAMPLE
-        let lat = -1.1166459318;
-        let lng = 131.2857774324;
-        let accuracy = 10;
+//        let lat = -1.1166459318;
+//        let lng = 131.2857774324;
+//        let accuracy = 10;
         
-//        let lat = pos.coords.latitude;
-//        let lng = pos.coords.longitude;
-//        let accuracy = pos.coords.accuracy;
+        let lat = pos.coords.latitude;
+        let lng = pos.coords.longitude;
+        let accuracy = pos.coords.accuracy;
         
         $("#alamat").html(`<i class="fa fa-spinner fa-spin fa-fw fa-2x"></i> 
             Mencari lokasi akurat, tunggu sebentar . . . (`+Math.round(accuracy)+` meter)`);
@@ -210,6 +243,106 @@ load_js(array(
         }
         clearTimeout(gpsTimeout);
         startGPS();
+    }
+    // ================== Ambil Foto ==================
+    async function takeFoto() {
+        
+        $("#spin-foto").show();
+        
+        const username = "<?= $this->session->userdata('name') ?>";
+        const lokasi = $("#lokasi").val();
+        
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // ===== TAMBAHAN: Deteksi Wajah =====
+        const options = new faceapi.TinyFaceDetectorOptions({
+            inputSize: 160, // Semakin kecil semakin cepat (pilihan: 128, 160, 224)
+            scoreThreshold: 0.5 // Akurasi (0.5 sudah cukup baik)
+        });
+        const detections = await faceapi.detectSingleFace(video, options);
+        if (!detections) {
+            setTimeout(function () {
+                $("#spin-foto").hide();
+            }, 1000);
+            jsfNotif('Peringatan', 'Wajah tidak terdeteksi! Pastikan wajah terlihat jelas.', 2, 'swal');
+            return;
+        }
+        $("#spin-foto").hide();
+        // CHECK FOTO
+        if(!video.videoWidth){
+            jsfNotif('Peringatan', 'Foto tidak ditemukan', 2, 'swal');
+            return;
+        }
+        // CHECK GPS
+        if(!lokasi){
+            jsfNotif('Peringatan', 'Lokasi tidak ditemukan', 2, 'swal');
+            return;
+        }
+        // DRAW FOTO CANVAS
+        const maxWidth = 400;
+        const scale = maxWidth / video.videoWidth;
+        canvas.width = maxWidth;
+        canvas.height = video.videoHeight * scale;
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        // ===== Watermark =====
+        ctx.fillStyle = "white";
+        ctx.font = "16px Arial";
+        ctx.fillText(username, 10, canvas.height - 60);
+        ctx.fillText(new Date().toLocaleString(), 10, canvas.height - 40);
+        ctx.fillText("Lokasi : " + lokasi, 10, canvas.height - 20);
+        // ===== Compress =====
+        let quality = 0.3;
+        let dataURL = canvas.toDataURL('image/jpeg', quality);
+        // ===== preview =====
+        let preview = document.getElementById("preview");
+        preview.src = dataURL;
+        preview.style.display = "block";
+        
+        // Stop kamera
+        if(streamGlobal) {
+            streamGlobal.getTracks().forEach(track => track.stop());
+        }
+        video.srcObject = null;
+        
+        // Set Input Value & Toggle Tombol
+        $("#foto").val(dataURL);
+        $("#video, #btn-foto").hide();
+        $("#btn-kamera").show();
+        jsfNotif('Informasi', 'Foto berhasil', 1);
+    }
+    function restartFoto() {
+        const lokasi = $("#lokasi").val();
+        if(!lokasi){
+            jsfNotif('Peringatan', 'Lokasi tidak ditemukan', 2, 'swal');
+            return;
+        }
+        $("#preview").attr("src", "").hide();
+        $("#video").show();
+        $("#foto").val("");
+        //Buka Kamera
+        navigator.mediaDevices.getUserMedia({ 
+            video: { facingMode: "user" }
+        })
+        .then(stream => {
+            streamGlobal = stream; 
+            video.srcObject = stream;
+            $("#btn-foto").show();
+            $("#btn-kamera").hide();
+        })
+        .catch(err => {
+            jsfNotif('Peringatan', 'Kamera tidak dizinkan. Buka pengaturan akses pada Browser', 3, 'swal');
+        });
+    }
+    async function initFaceAPI() {
+        try {
+            await faceapi.tf.setBackend('cpu');
+            
+            const MODEL_URL = 'https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights';
+            await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+        } catch (err) {
+            console.error("Gagal load Face-API:", err);
+        }
     }
 </script>
 <script type="text/javascript">
@@ -272,6 +405,13 @@ load_js(array(
             },
             loadingDialog: false,
             onValid: function(formEl) {
+                const dataURL = $("#foto").val();
+                const error = validateImage(dataURL);
+                // FOTO
+                if (error) {
+                    jsfNotif('Peringatan', error, 2, 'swal');
+                    return false;
+                }
                 const title = `<h4 class="red center"><i class="ace-icon fa fa-exclamation-triangle red"></i> Peringatan !</h4>`;
                 const msg = `<p class="center grey bigger-120"><i class="ace-icon fa fa-hand-o-right blue"></i>
                      Apakah anda yakin akan menyimpan data ? </p>`;
@@ -290,5 +430,27 @@ load_js(array(
                 return false;
             }
         });
+    }
+    function validateImage(dataURL) {
+        if (!dataURL) return "Foto masih kosong";
+        // cek format
+        if (!dataURL.startsWith("data:image/")) {
+            return "Format harus gambar";
+        }
+        // cek mime type (opsional)
+        const allowed = ['image/jpeg', 'image/png', 'image/webp'];
+        let mime = dataURL.split(';')[0].replace('data:', '');
+
+        if (!allowed.includes(mime)) {
+            return "Format Foto tidak diizinkan";
+        }
+        // cek ukuran (approx base64 → byte)
+        let sizeInBytes = Math.round((dataURL.length * 3) / 4);
+        let maxSize = 2 * 1024 * 1024; // 2MB
+
+        if (sizeInBytes > maxSize) {
+            return "Ukuran Foto terlalu besar (max 2MB)";
+        }
+        return null;
     }
 </script>
