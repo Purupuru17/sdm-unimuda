@@ -24,7 +24,7 @@ $this->load->view('sistem/v_breadcrumb');
             <?= $this->session->flashdata('notif'); ?>
         </div>
         <div class="col-xs-12">
-            <form id="search-form" action="<?= site_url($module.'/export') ?>" name="form" class="form-horizontal" method="POST">
+            <form id="search-form" action="<?= site_url($module.'_do/export') ?>" name="form" class="form-horizontal" method="POST">
                 <div class="form-group">
                     <label class="control-label col-xs-12 col-sm-2 no-padding-right">Pegawai :</label>
                     <div class="col-xs-12 col-sm-3">
@@ -326,15 +326,15 @@ $this->load->view('sistem/v_breadcrumb');
     function setTable(res)
     {
         // ================= HEADER =================
-        var trHead = '<tr><th width="5%">#</th><th width="15%">Nama</th>';
+        var trHead = `<tr><th width="5%">#</th><th width="15%">Nama</th>`;
         $.each(res.periode, function(i, tgl) {
             var date = new Date(tgl);
             var hari = date.toLocaleDateString('id-ID', { weekday: 'long' });
-            var tglNum = date.getDate();
-
-            trHead += '<th>' + tglNum + '<br><small>' + hari + '</small></th>';
+            var tgl = date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+            
+            trHead += `<th>${tgl}<br><small>${hari}</small></th>`;
         });
-        trHead += '<th width="10%">Kehadiran</th></tr>';
+        trHead += `<th width="10%">Kehadiran</th></tr>`;
         $('#rekap-table thead').html(trHead);
         // ================= LOAD =================
         rekapTable = $("#rekap-table").dataTable({

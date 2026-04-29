@@ -24,7 +24,7 @@ $this->load->view('sistem/v_breadcrumb');
             <?= $this->session->flashdata('notif'); ?>
         </div>
         <div class="col-xs-12">
-            <form id="search-form" action="<?= site_url($module.'/export') ?>" name="form" class="form-horizontal" method="POST">
+            <form id="search-form" action="<?= site_url($module.'_do/export') ?>" name="form" class="form-horizontal" method="POST">
                 <div class="form-group">
                     <label class="control-label col-xs-12 col-sm-2 no-padding-right">Pegawai :</label>
                     <div class="col-xs-12 col-sm-3">
@@ -63,7 +63,7 @@ $this->load->view('sistem/v_breadcrumb');
                         </div>
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group <?= $this->session->userdata('level') == '1' ? '':'hide' ?>">
                     <label class="control-label col-xs-12 col-sm-2 no-padding-right">Validasi :</label>
                     <div class="col-xs-12 col-sm-2">
                         <div class="clearfix">
@@ -95,7 +95,7 @@ $this->load->view('sistem/v_breadcrumb');
                             <i class="ace-icon fa fa-search-plus"></i>
                             Pencarian
                         </button>
-                        <button class="btn btn-success btn-white btn-bold hide" name="export" id="btn-export" type="submit">
+                        <button class="btn btn-success btn-white btn-bold" name="export" id="btn-export" type="submit">
                             <i class="ace-icon fa fa-file-excel-o"></i>
                             Export
                         </button>
@@ -104,49 +104,110 @@ $this->load->view('sistem/v_breadcrumb');
             </form>
         </div>
         <div class="col-xs-12">
-            <div class="widget-box widget-color-blue2">
-                <div class="widget-header">
-                    <h5 class="widget-title bigger lighter">
-                        <i class="ace-icon fa fa-list"></i>
-                        <?= $title[1] ?>
-                    </h5>
-                    <div class="widget-toolbar no-border">
-                        <div class="btn-group btn-overlap">
-                            <a href="<?= site_url($module.'/add') ?>" class="btn btn-white btn-primary btn-bold">
-                                <i class="fa fa-plus-square bigger-110 blue"></i> Tambah Data
-                            </a>
-                            <button class="btn btn-white btn-success btn-bold <?= $this->session->userdata('level') == '1' ? '':'hide' ?>" id="btn-validate">
-                                <i class="fa fa-check bigger-110"></i> Validasi
-                            </button>
+            <div class="space-4"></div>
+            <div class="tabbable">
+                <ul class="nav nav-tabs padding-10">
+                    <li class="active">
+                        <a data-toggle="tab" href="#satu" class="">
+                            <i class="ace-icon fa fa-check-square-o bigger-120 blue"></i>
+                            Presensi
+                        </a>
+                    </li>
+                    <li class="">
+                        <a data-toggle="tab" href="#dua" class="">
+                            <i class="ace-icon fa fa-users bigger-120 green"></i>
+                            Rekap Kehadiran
+                        </a>
+                    </li>
+                </ul>
+                <div class="tab-content no-border padding-10">
+                    <div id="satu" class="tab-pane active in">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="widget-box widget-color-blue2">
+                                    <div class="widget-header">
+                                        <h5 class="widget-title bigger lighter">
+                                            <i class="ace-icon fa fa-list"></i>
+                                            <?= $title[1] ?>
+                                        </h5>
+                                        <div class="widget-toolbar no-border">
+                                            <div class="btn-group btn-overlap">
+                                                <a href="<?= site_url($module.'/add') ?>" class="btn btn-white btn-primary btn-bold">
+                                                    <i class="fa fa-plus-square bigger-110 blue"></i> Tambah Data
+                                                </a>
+                                                <button class="btn btn-white btn-success btn-bold <?= $this->session->userdata('level') == '1' ? '':'hide' ?>" id="btn-validate">
+                                                    <i class="fa fa-check bigger-110"></i> Validasi
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="widget-body">
+                                        <div class="widget-main padding-2 table-responsive">
+                                            <table id="index-table" class="table table-striped table-bordered table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th width="5%">
+                                                            <label class="pos-rel">
+                                                                <input type="checkbox" class="ace ace-checkbox-2"/>
+                                                                <span class="lbl"></span>
+                                                            </label>
+                                                        </th>
+                                                        <th>Pegawai</th>
+                                                        <th>Presensi</th>
+                                                        <th>Validasi & Status</th>
+                                                        <th>Agenda</th>
+                                                        <th>Aksi</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="dua" class="tab-pane fade">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="widget-box widget-color-green2">
+                                    <div class="widget-header">
+                                        <h5 class="widget-title bigger lighter">
+                                            <i class="ace-icon fa fa-list"></i>
+                                            <?= $title[1] ?>
+                                        </h5>
+                                        <div class="widget-toolbar no-border">
+                                            <div class="btn-group btn-overlap">
+                                                <button onclick="loadRekap()" class="btn btn-white btn-primary btn-bold">
+                                                    <i class="fa fa-search-plus bigger-110"></i> Lihat Data
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="widget-body">
+                                        <p id="one-spin" style="display: none; margin-top: 10px;" class="bigger-130 blue" align="center">
+                                            <i class="fa fa-spinner fa-spin fa-fw fa-2x"></i> Loading . . .
+                                        </p>
+                                        <div class="widget-main padding-2 table-responsive">
+                                            <table id="rekap-table" class="table table-striped table-bordered table-hover">
+                                                <thead>
+                                                </thead>
+                                                <tbody>
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="widget-body">
-                    <div class="widget-main padding-2 table-responsive">
-                        <table id="index-table" class="table table-striped table-bordered table-hover">
-                            <thead>
-                                <tr>
-                                    <th width="5%">
-                                        <label class="pos-rel">
-                                            <input type="checkbox" class="ace ace-checkbox-2"/>
-                                            <span class="lbl"></span>
-                                        </label>
-                                    </th>
-                                    <th>Pegawai</th>
-                                    <th>Presensi</th>
-                                    <th>Validasi & Status</th>
-                                    <th>Agenda</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
             </div>
-        </div><!-- /.col -->
+        </div>
+        <!-- /.col -->
     </div><!-- /.row -->
 </div><!-- /.page-content -->
 
@@ -160,7 +221,7 @@ $this->load->view('sistem/v_breadcrumb');
 ?>
 <script type="text/javascript">
     const module = "<?= site_url($module) ?>";
-    let indexTable;
+    let indexTable, rekapTable;
     $(document).ready(function () {
         $(".select2").select2({allowClear: true});
         $(".input-daterange, #post_tgl").datepicker({
@@ -201,6 +262,21 @@ $this->load->view('sistem/v_breadcrumb');
         e.preventDefault();
         const prop = $(this).attr("itemprop");
         bootbox.dialog({ message: `<p class="center">${prop}</p>`, backdrop: true, onEscape: true });
+    });
+    $(document.body).on("click", "#view-btn", function(e) {
+        e.preventDefault();
+        const status = $(this).attr("itemid");
+        const waktu = $(this).attr("itemwk");
+        const foto = $(this).attr("itemft");
+        const msg = `<p class="center"><img src="${foto}" class="img-thumbnail" width="70%"/></p>`;
+        if(status){
+            bootbox.dialog({title: `<h4 class="center">${status} (${waktu})</h4>`, message: msg, backdrop: true, onEscape: true}); 
+        }
+    });
+    $(document.body).on("click", "#view-th", function(e) {
+        e.preventDefault();
+        const data = $(this).attr("itemid");
+        console.log(data);
     });
     $(document.body).on("click", "#valid-btn", function(e) {
         e.preventDefault();
@@ -298,6 +374,59 @@ $this->load->view('sistem/v_breadcrumb');
         $("#btn-search").click(function () {
             indexTable.reload();
         });
+    }
+    function loadRekap()
+    {
+        $("#one-spin").show();
+        $('#rekap-table thead').html('');
+        if ($.fn.dataTable.isDataTable('#rekap-table')) {
+            $('#rekap-table').DataTable().clear().destroy();
+        }
+        jsfRequest(module + "/ajax/type/table/source/rekap", "POST",
+        { 
+            pegawai: $("#pegawai").val(), jenis: $("#jenis").val(),
+            awal: $("#awal").val(), akhir : $("#akhir").val()
+        }, { useLoading: true })
+        .done(function(rs) {
+            if (rs.status) {
+                setTable(rs.data);
+            } else {
+                jsfNotif('Peringatan', rs.msg, 2, 'swal');
+            }
+            $("#one-spin").hide();
+        })
+        .fail(function(err) {
+            console.error("load:", err);
+        });
+    }
+    function setTable(res)
+    {
+        // ================= HEADER =================
+        var trHead = `<tr><th width="5%">#</th><th width="15%">Nama</th>`;
+        $.each(res.agenda, function(i, k) {
+            var date = new Date(k.waktu_agenda);
+            var tgl = date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+            var jam = date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false });
+            
+            trHead += `<th title="${k.judul_agenda}">${k.jenis_agenda}<br><small>${tgl} | ${jam}</small></th>`;
+        });
+        trHead += `<th width="10%">Kehadiran</th></tr>`;
+        $('#rekap-table thead').html(trHead);
+        // ================= LOAD =================
+        rekapTable = $("#rekap-table").dataTable({
+            bScrollCollapse: true,
+            bAutoWidth: false, aaSorting: [],
+            aoColumnDefs: [
+                {
+                    bSortable: false,
+                    sClass: "center nowrap", aTargets: ["_all"]
+                }, { bSearchable: true, aTargets: [1] }
+            ]
+        });
+        $.each(res.table, function (index, value) {
+            rekapTable.fnAddData(value);
+        });
+        rekapTable.fnAdjustColumnSizing();
     }
     function saveValidate(id)
     {

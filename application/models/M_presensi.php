@@ -14,7 +14,7 @@ class M_presensi extends KZ_Model {
             'join'       => [ ['m_pegawai pg','pg.id_pegawai = p.pegawai_id','left'] ],
             'columns'    => [null,'nama','tgl_presensi','waktu_masuk','waktu_pulang','status_presensi',null],
             'searchable' => ['nik','nama'],
-            'order'      => ['created_at' => 'desc']
+            'order'      => ['created_at' => 'asc']
         ];
         $result = parent::datatable($where, $options);
         $data = [];

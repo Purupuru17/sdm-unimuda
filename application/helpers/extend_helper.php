@@ -117,7 +117,7 @@ if (!function_exists('load_array')) {
                 $val = ['Islam', 'Kristen', 'Katolik', 'Hindu', 'Budha', 'Konghucu', 'Lainnya'];
                 break;
             case 'jenis_pegawai':
-                $val = ['DOSEN','PEGAWAI','PARTTIME'];
+                $val = ['DOSEN','TENDIK','PARTTIME'];
                 break;
             case 'status_pegawai':
                 $val = ['PNS','SWASTA','YAYASAN','KONTRAK'];

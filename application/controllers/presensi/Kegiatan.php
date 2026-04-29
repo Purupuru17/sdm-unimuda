@@ -72,6 +72,8 @@ class Kegiatan extends KZ_Controller {
             //TABLE
             if($routing_module['source'] == 'index') {
                 $this->_tableIndex();
+            } else if($routing_module['source'] == 'rekap') {
+                $this->_tableRekap();
             }
         }else if($routing_module['type'] == 'list') {
             //TABLE
@@ -115,6 +117,68 @@ class Kegiatan extends KZ_Controller {
         $datatables = $this->m_kegiatan->getDatatables($where, ['module' => $this->module, 'level' => $this->sessionlevel]);
         jsonResponse($datatables);
     }
+    function _tableRekap()
+    {
+        if(!$this->fungsi->Validation($this->rules, 'ajax')){
+            jsonResponse(['status' => false, 'msg' => validation_errors()]);
+        }
+        $jenis = $this->input->post('jenis');
+        $awal = $this->input->post('awal');
+        $akhir = $this->input->post('akhir');
+        
+        $where['DATE(waktu) >='] = $awal;
+        $where['DATE(waktu) <='] = $akhir;
+        if ($jenis != '') {
+            $where['jenis_pegawai'] = $jenis;
+        }
+        if(!empty($this->pid) && ($this->sessionlevel != '1')){
+            $where['pegawai_id'] = $this->pid;
+        }
+        $pivot = $this->m_kegiatan->pivotData($where, $awal, $akhir);
+        if(empty($pivot['data'])){
+            jsonResponse(array('status' => false, 'msg' => 'Data tidak ditemukan'));
+        }
+        // ================= PIVOT TABLE =================
+        $data = ['table' => []];
+        $no = 1;
+        foreach ($pivot['data'] as $item) {
+            $rows = [];
+            $rows[] = $no;
+            $rows[] = '<strong>'.ctk($item['nama']).
+                '</strong><br><small class="grey">'.ctk($item['jenis']).'</small>';
+            
+            $jml_tepat = 0;
+            $jml_lambat = 0;
+            
+            foreach ($pivot['agenda'] as $keg) {
+
+                $status = $item[$keg['id_agenda']]['status'] ?? null;
+                $waktu = $item[$keg['id_agenda']]['waktu'] ?? '';
+                $foto = $item[$keg['id_agenda']]['foto'] ?? null;
+                $html = '-';
+                
+                if ($status === 'TEPAT WAKTU') {
+                    $html = '<i class="fa fa-calendar-check-o bigger-150 green"></i>';
+                    $jml_tepat++;
+                } else if ($status === 'TERLAMBAT') {
+                    $html = '<i class="fa fa-calendar-check-o bigger-120 red"></i>';
+                    $jml_lambat++;
+                }
+                $rows[] = '<span id="view-btn" itemid="'.$status.'" itemwk="'.format_date($waktu,4).'" 
+                    itemft="'.load_file($foto).'">'.$html.'</span>';
+            }
+            $jml_status = $jml_tepat + $jml_lambat;
+            $persen = $pivot['count'] ? round(($jml_status / $pivot['count']) * 100) : 0;
+            
+            $rows[] = '(<b>'.$persen.'%</b>)<br><small>'.$jml_tepat.' TEPAT - '.$jml_lambat.' TERLAMBAT</small>';
+
+            $data['table'][] = $rows;
+            $no++;
+        }
+        $data['agenda'] = $pivot['agenda'];
+        
+        jsonResponse(array('data' => $data, 'status' => true, 'msg' => 'Data ditemukan'));
+    }
     function _listPegawai()
     {
         $this->load->model(array('m_pegawai'));
@@ -139,4 +203,15 @@ class Kegiatan extends KZ_Controller {
         }
         jsonResponse($data);
     }
+    private $rules = [
+        [
+            'field' => 'awal',
+            'label' => 'Tanggal Awal',
+            'rules' => 'required|trim|xss_clean|min_length[5]'
+        ],[
+            'field' => 'akhir',
+            'label' => 'Tanggal Akhir',
+            'rules' => 'required|trim|xss_clean|min_length[5]'
+        ]
+    ];
 }
